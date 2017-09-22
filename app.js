@@ -8,18 +8,13 @@ var bodyParser = require('body-parser')
 var passport = require('passport')
 var flash = require('connect-flash')
 
-var index = require('./routes/index')
-var users = require('./routes/users')
-
 var app = express()
 
 require('./config/passport')(passport)
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
-// uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(logger('dev'))
 app.use(bodyParser.json())
@@ -36,15 +31,12 @@ app.use(session(
     }
 ))
 app.use(passport.initialize())
-app.use(passport.session()) // persistent login sessions
+app.use(passport.session())
 app.use(flash())
 
 require('./routes/create_user.js')(app, passport)
+require('./routes/index.js')(app, passport)
 
-app.use('/', index)
-app.use('/users', users)
-
-// catch 404 and forward to error handler
 app.use(function (req, res, next)
 {
     var err = new Error('Not Found')
@@ -52,7 +44,6 @@ app.use(function (req, res, next)
     next(err)
 })
 
-// error handler
 app.use(function (err, req, res, next)
 {
     // set locals, only providing error in development
