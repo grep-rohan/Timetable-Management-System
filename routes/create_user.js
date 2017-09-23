@@ -2,8 +2,13 @@ module.exports = function (app, passport)
 {
     app.get('/create_user', function (req, res, next)
     {
-        if(req.ip === '::1')
-            res.render('create_user.ejs', {message: req.flash('signupMessage')})
+        if (req.ip === '::1' || req.user.type === 'admin')
+            res.render('create_user.ejs',
+                {
+                    message: req.flash('signupMessage'),
+                    title: 'Create User'
+                }
+            )
         else
         {
             var error = new Error('Access Denied!')

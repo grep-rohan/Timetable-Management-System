@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BMU: Home</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <title>BMU : <%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/public/stylesheets/bootstrap.min.css">
     <style>
         body {
             padding-top: 80px;
@@ -17,7 +17,7 @@
         <h1>Home</h1>
         <a href="/logout" class="btn btn-default btn-sm">Logout</a>
     </div>
-    <h1>Welcome, <%= user.name %>!</h1>
+    <h2>Welcome, <%= user.name %>!</h2>
     <p><%= user.type %></p>
 </div>
 </body>

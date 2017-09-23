@@ -3,15 +3,21 @@ module.exports = function (app, passport)
     app.get('/', function (req, res)
     {
         if (!req.isAuthenticated())
-            res.render('login.ejs', {message: req.flash('loginMessage')})
+            res.render('login.ejs',
+                {
+                    message: req.flash('loginMessage'),
+                    title: 'Login'
+                }
+            )
         else
             res.render('home.ejs',
                 {
-                    user: req.user
-                })
+                    user: req.user,
+                    title: 'Home'
+                }
+            )
     })
 
-    // process the login form
     app.post('/login', passport.authenticate('local-login', {
             successRedirect: '/',
             failureRedirect: '/',
@@ -28,8 +34,9 @@ module.exports = function (app, passport)
             res.redirect('/')
         })
 
-    app.get('/logout', function(req, res) {
-        req.logout();
-        res.redirect('/');
-    });
+    app.get('/logout', function (req, res)
+    {
+        req.logout()
+        res.redirect('/')
+    })
 }
