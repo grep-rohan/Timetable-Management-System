@@ -87,12 +87,11 @@ module.exports = function (passport)
                     {
                         if (err)
                             return done(err)
-                        if (!rows.length)
+                        if (!rows.length ||
+                            !bcrypt.compareSync(password, rows[0].password))
                             return done(null, false,
-                                req.flash('loginMessage', 'No user found.'))
-                        if (!bcrypt.compareSync(password, rows[0].password))
-                            return done(null, false, req.flash('loginMessage',
-                                'Incorrect password.'))
+                                req.flash('loginMessage',
+                                    'Incorrect Credentials!'))
                         return done(null, rows[0])
                     })
             })

@@ -3,22 +3,15 @@
 <head>
     <title>BMU : <%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/public/stylesheets/bootstrap.min.css">
-    <style>
-        body {
-            padding-top: 80px;
-            word-wrap: break-word;
-        }
-    </style>
+    <link rel="stylesheet" href="/public/stylesheets/w3.css">
 </head>
 <body>
-<div class="container">
-    <div class="page-header text-center">
-        <h1>Home</h1>
-        <a href="/logout" class="btn btn-default btn-sm">Logout</a>
-    </div>
+<div class="w3-bar w3-black w3-card-4 w3-large w3-animate-top">
+    <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
+    <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
+</div>
+<div class="w3-container w3-padding-64">
     <h2>Welcome, <%= user.name %>!</h2>
-    <p><%= user.type %></p>
 </div>
 </body>
 </html>
