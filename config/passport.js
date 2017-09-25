@@ -60,12 +60,12 @@ module.exports = function (passport)
 
     passport.serializeUser(function (user, done)
     {
-        done(null, user.id)
+        done(null, user.uid)
     })
 
     passport.deserializeUser(function (id, done)
     {
-        connection.query('SELECT * FROM users WHERE id = ? ', [id],
+        connection.query('SELECT * FROM users WHERE uid = ? ', [id],
             function (err, rows)
             {
                 done(err, rows[0])

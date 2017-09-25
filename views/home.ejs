@@ -3,15 +3,16 @@
 <head>
     <title>BMU : <%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/public/stylesheets/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
 <body>
-<div class="w3-bar w3-black w3-card-4 w3-large w3-animate-top">
+<div class="w3-bar w3-black w3-card-4 w3-large">
     <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
     <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
+    <span class="w3-bar-item w3-padding-16 w3-right"><%= user.name %></span>
 </div>
 <div class="w3-container w3-padding-64">
-    <h2>Welcome, <%= user.name %>!</h2>
+
 </div>
 </body>
 </html>

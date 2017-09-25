@@ -34,8 +34,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
 
-require('./routes/create_user.js')(app, passport)
-require('./routes/index.js')(app, passport)
+require('./routes.js')(app, passport)
 
 app.use(function (req, res, next)
 {
