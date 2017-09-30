@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
 <body>
-<div class="w3-bar w3-black w3-card-4 w3-large">
+<div class="w3-bar w3-black w3-card-4 w3-large w3-top">
     <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
     <%
     console.log(user)
@@ -15,35 +15,7 @@
     <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
     <% } %>
 </div>
-<div class="w3-container w3-padding-64 w3-third w3-display-middle">
-    <form action="/create_user" method="post"
-          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4">
-        <h2>Create User</h2>
-        <label>Name</label>
-        <label>
-            <input type="text" class="w3-input w3-border w3-round" name="name" required>
-        </label>
-        <label>Username</label>
-        <label>
-            <input type="text" class="w3-input w3-border w3-round" name="username" required>
-        </label>
-        <label>Password</label>
-        <label>
-            <input type="password" class="w3-input w3-border w3-round" name="password" required>
-        </label>
-        <label>User Type</label>
-        <label>
-            <select class="w3-select w3-border w3-round" name="type" required>
-                <option value=""></option>
-                <option value="student">Student</option>
-                <option value="faculty">Faculty</option>
-                <option value="po">Program Office</option>
-                <option value="admin">Admin</option>
-            </select>
-        </label>
-        <br><br>
-        <button type="submit" class="w3-btn w3-round w3-blue">Create User</button>
-    </form>
+<div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
     <%
     if (message.length > 0)
     {
@@ -70,6 +42,34 @@
     }
     }
     %>
+    <form action="/create_user" method="post"
+          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4">
+        <h2>Create User</h2>
+        <label>Name</label>
+        <label>
+            <input type="text" class="w3-input w3-border w3-round" name="name" required>
+        </label>
+        <label>Username</label>
+        <label>
+            <input type="text" class="w3-input w3-border w3-round" name="username" required>
+        </label>
+        <label>Password</label>
+        <label>
+            <input type="password" class="w3-input w3-border w3-round" name="password" required>
+        </label>
+        <label>User Type</label>
+        <label>
+            <select class="w3-select w3-border w3-round" name="type" required>
+                <option value=""></option>
+                <option value="student">Student</option>
+                <option value="faculty">Faculty</option>
+                <option value="po">Program Office</option>
+                <option value="admin">Admin</option>
+            </select>
+        </label>
+        <br>
+        <button type="submit" class="w3-btn w3-round w3-blue">Create User</button>
+    </form>
 </div>
 </body>
 </html>

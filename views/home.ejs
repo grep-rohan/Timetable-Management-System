@@ -6,8 +6,16 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
 <body>
-<div class="w3-bar w3-black w3-card-4 w3-large">
+<div class="w3-bar w3-black w3-card-4 w3-large w3-top">
     <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
+    <%
+    if(user.type == 'po')
+    {
+    %>
+    <a href="/add_subject" class="w3-bar-item w3-button w3-padding-16">Add Subject</a>
+    <%
+    }
+    %>
     <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
     <span class="w3-bar-item w3-padding-16 w3-right"><%= user.name %></span>
 </div>

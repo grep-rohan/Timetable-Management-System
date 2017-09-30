@@ -7,13 +7,24 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
 <body>
-<div class="w3-bar w3-black w3-card-4 w3-large">
+<div class="w3-bar w3-black w3-card-4 w3-large w3-top">
     <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
 </div>
-<div class="w3-container w3-padding-64 w3-third w3-display-middle">
+<div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
+    <%
+    if (message.length > 0)
+    {
+    %>
+    <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov">&times;</span>
+        <%= message %>
+    </div>
+    <%
+    }
+    %>
     <form action="/login" method="post" class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4">
         <h2>Login</h2>
-        <br>
         <label>Username</label>
         <label>
             <input type="text" class="w3-input w3-border w3-round" name="username">
@@ -27,16 +38,9 @@
             <input type="checkbox" name="remember" value="yes" class="w3-check">
         </label>
         <label>Remember Me</label>
-        <br><br>
+        <br>
         <button type="submit" class="w3-btn w3-large w3-blue w3-round">Login</button>
     </form>
-    <% if (message.length > 0) { %>
-    <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
-        <span onclick="this.parentElement.style.display='none'"
-              class="w3-button w3-display-topright w3-hov">&times;</span>
-        <%= message %>
-    </div>
-    <% } %>
 </div>
 </body>
 </html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+    <title>BMU : <%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+<div class="w3-bar w3-black w3-card-4 w3-large w3-top">
+    <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
+    <%
+    if(typeof user !== 'undefined')
+    {
+    %>
+    <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
+    <%
+    }
+    %>
+</div>
+<div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
+    <%
+    if (message.length > 0)
+    {
+        var obj = JSON.parse(message)
+    if(obj.status === 'error')
+    {
+    %>
+    <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov">&times;</span>
+        <%= obj.message %>
+    </div>
+    <%
+    }
+    else
+    {
+    %>
+    <div class="w3-panel w3-green w3-card w3-padding-16 w3-display-container">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov">&times;</span>
+        <%= obj.message %>
+    </div>
+    <%
+    }
+    }
+    %>
+    <form action="/add_subject" method="post"
+          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4">
+        <h2>Add Subject</h2>
+        <label>Subject Name</label>
+        <label>
+            <input type="text" class="w3-input w3-border w3-round" name="name" required>
+        </label>
+        <label>Course</label>
+        <label>
+            <select class="w3-select w3-border w3-round" name="course" required>
+                <option value=""></option>
+                <option value="btech">B. Tech</option>
+                <option value="mba">MBA</option>
+                <option value="bba">BBA</option>
+                <option value="bcomm">B. Comm</option>
+            </select>
+        </label>
+        <label>Stream</label>
+        <br>
+        <label>
+            <input class="w3-check" type="checkbox" name="none">
+        </label>
+        <label>None</label>
+        <br>
+        <label>
+            <input class="w3-check" type="checkbox" name="csc">
+        </label>
+        <label>CSC</label>
+        <br>
+        <label>
+            <input class="w3-check" type="checkbox" name="cse">
+        </label>
+        <label>CSE</label>
+        <br>
+        <label>
+            <input class="w3-check" type="checkbox" name="me">
+        </label>
+        <label>ME</label>
+        <br>
+        <label>
+            <input class="w3-check" type="checkbox" name="ece">
+        </label>
+        <label>ECE</label>
+        <br>
+        <label>
+            <input class="w3-check" type="checkbox" name="ce">
+        </label>
+        <label>CE</label>
+        <br>
+        <label>Lectures Per Week</label>
+        <label>
+            <input type="text" class="w3-input w3-border w3-round" name="lec_per_week" required>
+        </label>
+        <label>Batch</label>
+        <label>
+            <input type="text" class="w3-input w3-border w3-round" name="batch" required>
+        </label>
+        <br>
+        <button type="submit" class="w3-btn w3-round w3-blue">Add Subject</button>
+    </form>
+</div>
+</body>
+</html>
