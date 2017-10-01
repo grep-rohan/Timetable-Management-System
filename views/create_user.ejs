@@ -8,40 +8,27 @@
 <body>
 <div class="w3-bar w3-black w3-card-4 w3-large w3-top">
     <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
-    <%
-    console.log(user)
-    if(typeof user !== 'undefined')
-    { %>
+
+    <% if(typeof user !== 'undefined') { %>
     <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
     <% } %>
 </div>
 <div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
-    <%
-    if (message.length > 0)
-    {
+    <% if (message.length > 0) {
         var obj = JSON.parse(message)
-    if(obj.status === 'error')
-    {
-    %>
+    if(obj.status === 'error') { %>
     <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
         <span onclick="this.parentElement.style.display='none'"
               class="w3-button w3-display-topright w3-hov">&times;</span>
         <%= obj.message %>
     </div>
-    <%
-    }
-    else
-    {
-    %>
+    <% } else { %>
     <div class="w3-panel w3-green w3-card w3-padding-16 w3-display-container">
         <span onclick="this.parentElement.style.display='none'"
               class="w3-button w3-display-topright w3-hov">&times;</span>
         <%= obj.message %>
     </div>
-    <%
-    }
-    }
-    %>
+    <% }} %>
     <form action="/create_user" method="post"
           class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4">
         <h2>Create User</h2>
@@ -67,7 +54,7 @@
                 <option value="admin">Admin</option>
             </select>
         </label>
-        <br>
+        <br><br>
         <button type="submit" class="w3-btn w3-round w3-blue">Create User</button>
     </form>
 </div>

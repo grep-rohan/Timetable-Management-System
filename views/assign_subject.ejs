@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+    <title>BMU : <%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+
+<!--nav bar-->
+<div class="w3-bar w3-black w3-card-4 w3-large w3-top">
+    <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
+
+    <% if(user.type == 'po') { %>
+    <a href="/add_subject" class="w3-bar-item w3-button w3-padding-16">Add Subject</a>
+
+    <a href="/assign_subject" class="w3-bar-item w3-button w3-padding-16 w3-blue">Assign Subject</a>
+    <% } %>
+
+    <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
+
+    <span class="w3-bar-item w3-padding-16 w3-right"><%= user.name %></span>
+</div>
+
+<!--main container-->
+<div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
+    <!--flash message-->
+    <% if (message.length > 0) {
+        var obj = JSON.parse(message)
+    if(obj.status === 'error') { %>
+    <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov">&times;</span>
+        <%= obj.message %>
+    </div>
+    <% } else { %>
+    <div class="w3-panel w3-green w3-card w3-padding-16 w3-display-container">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov">&times;</span>
+        <%= obj.message %>
+    </div>
+    <% }} %>
+
+    <!--form-->
+    <form action="/add_subject" method="post"
+          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4" id="form">
+        <h2>Assign Subject</h2>
+
+
+
+        <br>
+
+        <button type="submit" class="w3-btn w3-round w3-blue">Add Subject</button>
+    </form>
+</div>
+</body>
+</html>

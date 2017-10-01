@@ -4,104 +4,164 @@
     <title>BMU : <%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
+<script type="text/javascript">
+    // toggle visibility of streams based on selected course
+    function streamVisibility ()
+    {
+        var course = document.getElementById('course')
+        if (course.options[course.selectedIndex].value === 'btech')
+        {
+            document.getElementById('stream').style.display = 'block'
+            document.getElementById('none').checked = false
+        }
+        else
+        {
+            document.getElementById('stream').style.display = 'none'
+            document.getElementById('none').checked = true
+        }
+    }
+
+    // allow only number input
+    function isNumber (evt)
+    {
+        evt = (evt) ? evt : window.event
+        var charCode = (evt.which) ? evt.which : evt.keyCode
+        return !(charCode > 31 && (charCode < 48 || charCode > 57))
+
+    }
+
+    jQuery(function ($)
+    {
+        $('#form').submit(function (e)
+        {
+            //check atleat 1 checkbox is checked
+            if (!$('.w3-check').is(':checked'))
+            {
+                alert('Choose atleast 1 stream! ')
+                e.preventDefault()
+            }
+        })
+    })
+</script>
+
+<!--nav bar-->
 <div class="w3-bar w3-black w3-card-4 w3-large w3-top">
     <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
-    <%
-    if(typeof user !== 'undefined')
-    {
-    %>
+
+    <% if(user.type == 'po') { %>
+    <a href="/add_subject" class="w3-bar-item w3-button w3-padding-16 w3-blue">Add Subject</a>
+
+    <a href="/assign_subject" class="w3-bar-item w3-button w3-padding-16">Assign Subject</a>
+    <% } %>
+
     <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
-    <%
-    }
-    %>
+
+    <span class="w3-bar-item w3-padding-16 w3-right"><%= user.name %></span>
 </div>
+
+<!--main container-->
 <div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
-    <%
-    if (message.length > 0)
-    {
+    <!--flash message-->
+    <% if (message.length > 0) {
         var obj = JSON.parse(message)
-    if(obj.status === 'error')
-    {
-    %>
+    if(obj.status === 'error') { %>
     <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
         <span onclick="this.parentElement.style.display='none'"
               class="w3-button w3-display-topright w3-hov">&times;</span>
         <%= obj.message %>
     </div>
-    <%
-    }
-    else
-    {
-    %>
+    <% } else { %>
     <div class="w3-panel w3-green w3-card w3-padding-16 w3-display-container">
         <span onclick="this.parentElement.style.display='none'"
               class="w3-button w3-display-topright w3-hov">&times;</span>
         <%= obj.message %>
     </div>
-    <%
-    }
-    }
-    %>
+    <% }} %>
+
+    <!--form-->
     <form action="/add_subject" method="post"
-          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4">
+          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4" id="form">
         <h2>Add Subject</h2>
-        <label>Subject Name</label>
+
+        <label>Subject Name<span class="w3-text-red">*</span></label>
         <label>
-            <input type="text" class="w3-input w3-border w3-round" name="name" required>
+            <input type="text" class="w3-input w3-border w3-round" name="name" required maxlength="255" minlength="5">
         </label>
-        <label>Course</label>
+
+        <label>Course<span class="w3-text-red">*</span></label>
         <label>
-            <select class="w3-select w3-border w3-round" name="course" required>
+            <select class="w3-select w3-border w3-round" name="course" required onchange="streamVisibility()"
+                    id="course">
                 <option value=""></option>
-                <option value="btech">B. Tech</option>
-                <option value="mba">MBA</option>
                 <option value="bba">BBA</option>
-                <option value="bcomm">B. Comm</option>
+                <option value="bcomm">B.Comm</option>
+                <option value="btech">B.Tech</option>
+                <option value="mba">MBA</option>
             </select>
         </label>
-        <label>Stream</label>
-        <br>
+
+        <div id="stream" style="display: none">
+            <label>Stream<span class="w3-text-red">*</span></label>
+
+            <label>
+                <input type="checkbox" class="w3-check" name="none" id="none" checked style="display: none">
+            </label>
+
+            <br>
+
+            <label>
+                <input class="w3-check" type="checkbox" name="csc">
+            </label>
+            <label>CSC</label>
+            <br>
+            <label>
+                <input class="w3-check" type="checkbox" name="cse">
+            </label>
+            <label>CSE</label>
+            <br>
+            <label>
+                <input class="w3-check" type="checkbox" name="me">
+            </label>
+            <label>ME</label>
+            <br>
+            <label>
+                <input class="w3-check" type="checkbox" name="ece">
+            </label>
+            <label>ECE</label>
+            <br>
+            <label>
+                <input class="w3-check" type="checkbox" name="ce">
+            </label>
+            <label>CE</label>
+        </div>
+
+        <label>Lectures Per Week<span class="w3-text-red">*</span></label>
         <label>
-            <input class="w3-check" type="checkbox" name="none">
+            <input type="number" class="w3-input w3-border w3-round" name="lec_per_week" required
+                   onkeypress="return isNumber(event)" min="1" max="5">
         </label>
-        <label>None</label>
-        <br>
+
+        <label>Batch<span class="w3-text-red">*</span></label>
         <label>
-            <input class="w3-check" type="checkbox" name="csc">
+            <input type="number" class="w3-input w3-border w3-round" name="batch" required
+                   onkeypress="return isNumber(event)" min="" max="" id="batch">
         </label>
-        <label>CSC</label>
+
+        <script type="text/javascript">
+            // set input constraints for batch
+            var dt = new Date()
+            var maxYear = dt.getYear() + 1900
+            var minYear = maxYear - 4
+            var batch = document.getElementById('batch')
+            batch.setAttribute('max', maxYear.toString())
+            batch.setAttribute('min', minYear.toString())
+        </script>
+
         <br>
-        <label>
-            <input class="w3-check" type="checkbox" name="cse">
-        </label>
-        <label>CSE</label>
-        <br>
-        <label>
-            <input class="w3-check" type="checkbox" name="me">
-        </label>
-        <label>ME</label>
-        <br>
-        <label>
-            <input class="w3-check" type="checkbox" name="ece">
-        </label>
-        <label>ECE</label>
-        <br>
-        <label>
-            <input class="w3-check" type="checkbox" name="ce">
-        </label>
-        <label>CE</label>
-        <br>
-        <label>Lectures Per Week</label>
-        <label>
-            <input type="text" class="w3-input w3-border w3-round" name="lec_per_week" required>
-        </label>
-        <label>Batch</label>
-        <label>
-            <input type="text" class="w3-input w3-border w3-round" name="batch" required>
-        </label>
-        <br>
+
         <button type="submit" class="w3-btn w3-round w3-blue">Add Subject</button>
     </form>
 </div>

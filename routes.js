@@ -113,6 +113,62 @@ module.exports = function (app, passport)
         '/add_subject',
         function (req, res)
         {
+            // server side validation of form
+
+            // subject name validation
+            var name = req.body.name
+            if (name.length < 5 || name.length > 255)
+            {
+                console.log('Subject name error')
+                req.flash('addSubjectMessage',
+                    JSON.stringify(
+                        {
+                            status: 'error',
+                            message: 'Subject name should be between 5 to 255 characters!'
+                        }
+                    )
+                )
+                res.redirect('/add_subject')
+                return
+            }
+
+            // lectures per week validation
+            var lecPerWeek = req.body.lec_per_week
+            if (parseInt(lecPerWeek) < 1 || parseInt(lecPerWeek) > 5)
+            {
+                console.log('lectures per week error')
+                req.flash('addSubjectMessage',
+                    JSON.stringify(
+                        {
+                            status: 'error',
+                            message: 'Lectures per week should be between 1 and 5'
+                        }
+                    )
+                )
+                res.redirect('/add_subject')
+                return
+            }
+
+            // batch validation
+            var batch = req.body.batch
+            var dt = new Date()
+            var max = dt.getYear() + 1900
+            var min = max - 4
+            if (parseInt(batch) < min || parseInt(batch) > max)
+            {
+                console.log('batch error')
+                req.flash('addSubjectMessage',
+                    JSON.stringify(
+                        {
+                            status: 'error',
+                            message: 'Batch should be between ' + min + ' and ' + max
+                        }
+                    )
+                )
+                res.redirect('/add_subject')
+                return
+            }
+
             var mysql = require('mysql')
             var dbconfig = require('./config/database')
             var connection = mysql.createConnection(dbconfig.connection)
@@ -127,25 +183,10 @@ module.exports = function (app, passport)
                     values.push([req.body.name, req.body.course, streams[i], req.body.lec_per_week,
                         req.body.batch])
 
-            console.log(values)
-
-            connection.query(sql, [values], function (err, result)
+            var callback = function (result)
             {
-                if (err)
-                    req.flash(
-                        'addSubjectMessage',
-                        JSON.stringify(
-                            {
-                                status: 'error',
-                                message: 'Error adding subject!'
-                            }
-                        )
-                    )
-                else
-                {
-                    console.log(result)
-                    req.flash(
-                        'addSubjectMessage',
+                if (result)
+                    req.flash('addSubjectMessage',
                         JSON.stringify(
                             {
                                 status: 'success',
@@ -153,10 +194,67 @@ module.exports = function (app, passport)
                             }
                         )
                     )
+                else
+                    req.flash('addSubjectMessage',
+                        JSON.stringify(
+                            {
+                                status: 'error',
+                                message: 'Subject already exists!'
+                            }
+                        )
+                    )
+
+                connection.end()
+
+                res.redirect('/add_subject')
+            }
+
+            connection.query(sql, [values], function (err, result)
+            {
+                if (err)
+                {
+                    console.log(err.message)
+                    callback(false)
+                }
+                else
+                {
+                    console.log(result.message)
+                    callback(true)
                 }
             })
+        }
+    )
 
-            res.redirect('/add_subject')
+    /*
+    ------------------------------------------------- ASSIGN SUBJECT ---------------------------------------------------
+     */
+    app.get('/assign_subject',
+        function (req, res, next)
+        {
+            if (!req.isAuthenticated())
+                res.redirect('/')
+
+            if (req.user.type === 'po')
+                res.render('assign_subject.ejs',
+                    {
+                        title: 'Assign Subject',
+                        user: req.user,
+                        message: req.flash('assignSubjectMessage')
+                    }
+                )
+            else
+            {
+                var error = new Error('Access Denied!')
+                error.status = 401
+                next(error)
+            }
+        }
+    )
+
+    app.post('/assign_subject',
+        function (req, res)
+        {
+
         }
     )
 }
