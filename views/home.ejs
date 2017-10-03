@@ -4,21 +4,44 @@
     <title>BMU : <%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
+<script>
+    function showDropdown()
+    {
+        var x = document.getElementById('dropdown')
+        if (x.className.indexOf("w3-show") === -1)
+            x.className += " w3-show"
+        else
+            x.className = x.className.replace(" w3-show", "")
+
+    }
+</script>
+
 <!--nav bar-->
-<div class="w3-bar w3-black w3-card-4 w3-large w3-top">
-    <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
+<div class="w3-top">
+    <div class="w3-bar w3-black w3-card-4">
+        <a href="/" class="w3-bar-item w3-button">BMU : Home</a>
 
-    <% if(user.type == 'po') { %>
-    <a href="/add_subject" class="w3-bar-item w3-button w3-padding-16">Add Subject</a>
+        <% if(user.type === 'po') { %>
+        <div class="w3-dropdown-click">
+            <button class="w3-button" onclick="showDropdown()">
+                Options <i class="fa fa-caret-down"></i>
+            </button>
+            <div id="dropdown" class="w3-dropdown-content w3-bar-block w3-card-4">
+                <a href="/add_subject" class="w3-bar-item w3-button">Add Subject</a>
+                <a href="#" class="w3-bar-item w3-button">View Subjects</a>
+                <a href="/assign_subject" class="w3-bar-item w3-button">Assign Subject</a>
+                <a href="#" class="w3-bar-item w3-button">View Assignments</a>
+            </div>
+        </div>
+        <% } %>
 
-    <a href="/assign_subject" class="w3-bar-item w3-button w3-padding-16">Assign Subject</a>
-    <% } %>
+        <a href="/logout" class="w3-bar-item w3-button w3-right">Logout</a>
 
-    <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
-
-    <span class="w3-bar-item w3-padding-16 w3-right"><%= user.name %></span>
+        <span class="w3-bar-item w3-right"><%= user.name %></span>
+    </div>
 </div>
 
 <!--main container-->

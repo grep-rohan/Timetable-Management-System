@@ -231,30 +231,116 @@ module.exports = function (app, passport)
     app.get('/assign_subject',
         function (req, res, next)
         {
-            if (!req.isAuthenticated())
-                res.redirect('/')
+            var mysql = require('mysql')
+            var dbconfig = require('./config/database')
+            var connection = mysql.createConnection(dbconfig.connection)
 
-            if (req.user.type === 'po')
-                res.render('assign_subject.ejs',
+            connection.query('USE ' + dbconfig.database)
+
+            var sql = 'SELECT * FROM users WHERE type=\'faculty\' ORDER BY name'
+
+            var callback2 = function (faculty, subjects)
+            {
+                if (!req.isAuthenticated())
+                {
+                    res.redirect('/')
+                    return
+                }
+
+                if (req.user.type === 'po')
+                    res.render('assign_subject.ejs',
+                        {
+                            title: 'Assign Subject',
+                            user: req.user,
+                            message: req.flash('assignSubjectMessage'),
+                            faculty: faculty,
+                            subjects: subjects
+                        }
+                    )
+                else
+                {
+                    var error = new Error('Access Denied!')
+                    error.status = 401
+                    next(error)
+                }
+
+                connection.end()
+            }
+
+            var callback1 = function (result)
+            {
+                sql = 'SELECT * FROM subjects'
+                connection.query(sql,
+                    function (err, result2)
                     {
-                        title: 'Assign Subject',
-                        user: req.user,
-                        message: req.flash('assignSubjectMessage')
+                        callback2(result, result2)
                     }
                 )
-            else
-            {
-                var error = new Error('Access Denied!')
-                error.status = 401
-                next(error)
             }
+
+            connection.query(sql,
+                function (err, result)
+                {
+                    callback1(result)
+                }
+            )
+
         }
     )
 
     app.post('/assign_subject',
         function (req, res)
         {
+            var data = req.body
 
+            var mysql = require('mysql')
+            var dbconfig = require('./config/database')
+            var connection = mysql.createConnection(dbconfig.connection)
+
+            connection.query('USE ' + dbconfig.database)
+
+            var sql = 'INSERT INTO assignments (uid, sid) VALUES ?'
+            var values = [[data.faculty, data.name]]
+
+            var callback = function (result)
+            {
+                if (result)
+                    req.flash('assignSubjectMessage',
+                        JSON.stringify(
+                            {
+                                status: 'success',
+                                message: 'Assignment created successfully!'
+                            }
+                        )
+                    )
+                else
+                    req.flash('assignSubjectMessage',
+                        JSON.stringify(
+                            {
+                                status: 'error',
+                                message: 'Assignment already exists!'
+                            }
+                        )
+                    )
+
+                connection.end()
+
+                res.redirect('/assign_subject')
+            }
+
+            connection.query(sql, [values], function (err, result)
+            {
+                if (err)
+                {
+                    console.log(err.message)
+                    callback(false)
+                }
+                else
+                {
+                    console.log(result.message)
+                    callback(true)
+                }
+            })
         }
     )
 }
