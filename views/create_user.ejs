@@ -1,19 +1,23 @@
 <!doctype html>
 <html>
 <head>
-    <title>BMU : <%= title %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <% include ./partials/head.ejs %>
 </head>
 <body>
-<div class="w3-bar w3-black w3-card-4 w3-large w3-top">
-    <a href="/" class="w3-bar-item w3-button w3-padding-16">BMU</a>
+<!--navbar-->
+<div class="w3-bar w3-black w3-card-4 w3-top">
+    <a href="/" class="w3-bar-item w3-button"><i class="fa fa-home" style="color: white"></i> Home</a>
 
     <% if(typeof user !== 'undefined') { %>
-    <a href="/logout" class="w3-bar-item w3-button w3-right w3-padding-16">Logout</a>
+    <a href="/logout" class="w3-bar-item w3-button w3-right"><i class="fa fa-sign-out" style="color: white"></i> Logout</a>
+
+    <span class="w3-bar-item w3-right"><i class="fa fa-user" style="color: white"></i> <%= user.name %></span>
     <% } %>
 </div>
+
+<!--main container-->
 <div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
+    <!--flash message-->
     <% if (message.length > 0) {
         var obj = JSON.parse(message)
     if(obj.status === 'error') { %>
@@ -29,6 +33,8 @@
         <%= obj.message %>
     </div>
     <% }} %>
+
+    <!--form-->
     <form action="/create_user" method="post"
           class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4">
         <h2>Create User</h2>

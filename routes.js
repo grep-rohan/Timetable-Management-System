@@ -43,32 +43,35 @@ module.exports = function (app, passport)
     /*
     ------------------------------------------------- LOGOUT ----------------------------------------------
      */
-    app.get('/logout', function (req, res)
-    {
-        req.logout()
-        res.redirect('/')
-    })
+    app.get('/logout',
+        function (req, res)
+        {
+            req.logout()
+            res.redirect('/')
+        }
+    )
 
     /*
     ---------------------------------------------- CREATE USER -------------------------------------------
      */
-    app.get('/create_user', function (req, res, next)
-    {
-        if (req.ip === '::1' || req.user.type === 'admin')
-            res.render('create_user.ejs',
-                {
-                    message: req.flash('signupMessage'),
-                    title: 'Create User',
-                    user: req.user
-                }
-            )
-        else
+    app.get('/create_user',
+        function (req, res, next)
         {
-            var error = new Error('Access Denied!')
-            error.status = 401
-            next(error)
-        }
-    })
+            if (req.ip === '::1' || req.user.type === 'admin')
+                res.render('create_user.ejs',
+                    {
+                        message: req.flash('signupMessage'),
+                        title: 'Create User',
+                        user: req.user
+                    }
+                )
+            else
+            {
+                var error = new Error('Access Denied!')
+                error.status = 401
+                next(error)
+            }
+        })
 
     app.post(
         '/create_user',
@@ -85,8 +88,7 @@ module.exports = function (app, passport)
     /*
     ------------------------------------------------- ADD SUBJECT -------------------------------------------------
      */
-    app.get(
-        '/add_subject',
+    app.get('/add_subject',
         function (req, res, next)
         {
             if (!req.isAuthenticated())
@@ -109,8 +111,7 @@ module.exports = function (app, passport)
         }
     )
 
-    app.post(
-        '/add_subject',
+    app.post('/add_subject',
         function (req, res)
         {
             // server side validation of form
@@ -341,6 +342,240 @@ module.exports = function (app, passport)
                     callback(true)
                 }
             })
+        }
+    )
+
+    /*
+    ------------------------------------------------------------ VIEW SUBJECTS -----------------------------------------
+     */
+    app.get('/view_subjects',
+        function (req, res, next)
+        {
+            if (!req.isAuthenticated())
+            {
+                res.redirect('/')
+                return
+            }
+
+            if (req.user.type === 'po')
+            {
+                var mysql = require('mysql')
+                var dbconfig = require('./config/database')
+                var connection = mysql.createConnection(dbconfig.connection)
+
+                connection.query('USE ' + dbconfig.database)
+
+                var sql = 'SELECT * FROM subjects'
+
+                var callback = function (result)
+                {
+                    res.render('view_subjects.ejs',
+                        {
+                            title: 'View Subjects',
+                            user: req.user,
+                            subjects: result
+                        }
+                    )
+                    connection.end()
+                }
+
+                connection.query(sql,
+                    function (err, result)
+                    {
+                        callback(result)
+                    }
+                )
+            }
+            else
+            {
+                var error = new Error('Access Denied!')
+                error.status = 401
+                next(error)
+            }
+        }
+    )
+
+    /*
+    -------------------------------------------------------- MY SUBJECTS -----------------------------------------------
+     */
+    app.get('/my_subjects',
+        function (req, res, next)
+        {
+            if (!req.isAuthenticated())
+            {
+                res.redirect('/')
+                return
+            }
+
+            if (req.user.type === 'faculty')
+            {
+                var mysql = require('mysql')
+                var dbconfig = require('./config/database')
+                var connection = mysql.createConnection(dbconfig.connection)
+
+                connection.query('USE ' + dbconfig.database)
+
+                var sql = 'SELECT sid FROM assignments WHERE uid=' + req.user.uid
+
+                var callback2 = function (result)
+                {
+                    console.log(result)
+                    res.render('my_subjects.ejs',
+                        {
+                            title: 'My Subjects',
+                            user: req.user,
+                            subjects: result
+                        }
+                    )
+                    connection.end()
+                }
+
+                var callback1 = function (result)
+                {
+                    sql = 'SELECT * FROM subjects WHERE sid='
+                    for (var i = 0; i < result.length; i++)
+                    {
+                        if (i === 0)
+                            sql += result[i].sid
+                        else
+                            sql += ' OR sid=' + result[i].sid
+                    }
+
+                    connection.query(sql,
+                        function (err, result)
+                        {
+                            callback2(result)
+                        }
+                    )
+                }
+
+                connection.query(sql,
+                    function (err, result)
+                    {
+                        callback1(result)
+                    }
+                )
+            }
+            else
+            {
+                var error = new Error('Access Denied!')
+                error.status = 401
+                next(error)
+            }
+        }
+    )
+
+    /*
+    -------------------------------------------------------- ADD ROOM --------------------------------------------------
+     */
+    app.get('/add_room',
+        function (req, res, next)
+        {
+            if (!req.isAuthenticated())
+            {
+                res.redirect('/')
+                return
+            }
+
+            if (req.user.type === 'po')
+                res.render('add_room.ejs',
+                    {
+                        title: 'Add Room',
+                        message: req.flash('addRoomMessage'),
+                        user: req.user
+                    }
+                )
+            else
+            {
+                var error = new Error('Access Denied!')
+                error.status = 401
+                next(error)
+            }
+        }
+    )
+
+    app.post('/add_room',
+        function (req, res)
+        {
+            var data = req.body
+
+            if (data.name.length < 4 || data.name.length > 10)
+            {
+                req.flash('addRoomMessage',
+                    JSON.stringify(
+                        {
+                            status: 'error',
+                            message: 'Room name should be between 4 to 10 characters!'
+                        }
+                    )
+                )
+                res.redirect('/add_room')
+                return
+            }
+            if (data.capacity < 20 || data.capacity > 1000)
+            {
+                req.flash('addRoomMessage',
+                    JSON.stringify(
+                        {
+                            status: 'error',
+                            message: 'Capacity should be between 20 and 1000'
+                        }
+                    )
+                )
+                res.redirect('/add_room')
+                return
+            }
+
+            var mysql = require('mysql')
+            var dbconfig = require('./config/database')
+            var connection = mysql.createConnection(dbconfig.connection)
+
+            connection.query('USE ' + dbconfig.database)
+
+            var sql = 'INSERT INTO rooms (name, capacity) VALUES ?'
+            var values = [[data.name, data.capacity]]
+
+            var callback = function (result)
+            {
+                if (result)
+                    req.flash('addRoomMessage',
+                        JSON.stringify(
+                            {
+                                status: 'success',
+                                message: 'Room added successfully!'
+                            }
+                        )
+                    )
+                else
+                    req.flash('addRoomMessage',
+                        JSON.stringify(
+                            {
+                                status: 'error',
+                                message: 'Room already exists!'
+                            }
+                        )
+                    )
+
+                connection.end()
+
+                res.redirect('/add_room')
+            }
+
+            connection.query(sql, [values],
+                function (err, result)
+                {
+                    if (err)
+                    {
+                        console.log(err.message)
+                        callback(false)
+                    }
+                    else
+                    {
+                        console.log(result.message)
+                        callback(true)
+                    }
+                }
+            )
         }
     )
 }

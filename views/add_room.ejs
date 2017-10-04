@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+    <% include ./partials/head.ejs %>
+</head>
+<body>
+<!--js scripts-->
+<script type="text/javascript">
+    // allow only number input
+    function isNumber(evt)
+    {
+        evt = (evt) ? evt : window.event
+        var charCode = (evt.which) ? evt.which : evt.keyCode
+        return !(charCode > 31 && (charCode < 48 || charCode > 57))
+
+    }
+</script>
+
+<!--navbar-->
+<header>
+    <% include ./partials/navbar.ejs %>
+</header>
+
+<!--main container-->
+<div class="w3-container w3-padding-64 w3-third w3-display-topmiddle" id="container">
+    <!--flash message-->
+    <% if (message.length > 0) {
+        var obj = JSON.parse(message)
+    if(obj.status === 'error') { %>
+    <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov">&times;</span>
+        <%= obj.message %>
+    </div>
+    <% } else { %>
+    <div class="w3-panel w3-green w3-card w3-padding-16 w3-display-container">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov">&times;</span>
+        <%= obj.message %>
+    </div>
+    <% }} %>
+
+    <!--form-->
+    <form action="/add_room" method="post"
+          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4" id="form">
+        <h2>Add Room</h2>
+
+        <label>Room Name<span class="w3-text-red">*</span></label>
+        <label>
+            <input type="text" class="w3-input w3-border w3-round" name="name" required maxlength="10" minlength="4">
+        </label>
+
+        <label>Capacity<span class="w3-text-red">*</span></label>
+        <label>
+            <input type="number" class="w3-input w3-border w3-round" name="capacity" required
+                   onkeypress="return isNumber(event)" min="20" max="1000">
+        </label>
+
+        <br>
+
+        <button type="submit" class="w3-btn w3-round w3-blue">Add Room</button>
+    </form>
+</div>
+</body>
+</html>
