@@ -1,0 +1,15 @@
+<% if (message.length > 0) {
+    var obj = JSON.parse(message)
+if(obj.status === 'error') { %>
+<div class="w3-panel w3-red w3-display-container w3-padding w3-card-4 w3-round">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov w3-round">&times;</span>
+    <%= obj.message %>
+</div>
+<% } else { %>
+<div class="w3-panel w3-green w3-padding w3-display-container w3-card-4 w3-round">
+        <span onclick="this.parentElement.style.display='none'"
+              class="w3-button w3-display-topright w3-hov w3-round">&times;</span>
+    <%= obj.message %>
+</div>
+<% }} %>

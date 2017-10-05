@@ -11,25 +11,7 @@
 
 <!--main container-->
 <div class="w3-container w3-padding-64" id="container">
-    <div class="w3-responsive">
-        <table class="w3-table-all w3-card-4">
-            <tr class="w3-blue">
-                <th></th>
-                <% for(var i = 9; i <= 16; i++) { %>
-                <th><%= i %>:00-<%= i + 1 %>:00</th>
-                <% } %>
-            </tr>
-            <% var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
-            for(i = 0; i < 5; i++) { %>
-            <tr>
-                <th class="w3-blue"><%= days[i] %></th>
-                <% for(var j = 9; j <= 16; j++) { %>
-                <td>Bla</td>
-                <% } %>
-            </tr>
-            <% } %>
-        </table>
-    </div>
+
 </div>
 </body>
 </html>

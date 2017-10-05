@@ -7,6 +7,7 @@ connection.query('\
 	CREATE TABLE  IF NOT EXISTS `' + dbconfig.database + '`.`subjects` ( \
     `sid` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, \
     `name` VARCHAR(255) NOT NULL, \
+    `abbrev` VARCHAR(10) NOT NULL, \
     `course` ENUM(\'btech\', \'mba\', \'bba\', \'bcomm\') NOT NULL, \
     `stream` ENUM(\'none\', \'csc\', \'cse\', \'me\', \'ece\', \'ce\') NOT NULL, \
     `lec_per_week` TINYINT UNSIGNED NOT NULL, \

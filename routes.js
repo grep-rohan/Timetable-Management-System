@@ -13,12 +13,53 @@ module.exports = function (app, passport)
                 }
             )
         else
-            res.render('home.ejs',
+        {
+            if (req.user.type === 'faculty')
+                getTimings()
+            else
+                res.render('home.ejs',
+                    {
+                        user: req.user,
+                        title: 'Home'
+                    }
+                )
+        }
+
+        var callback = function (result)
+        {
+            res.render('home_faculty.ejs',
                 {
                     user: req.user,
-                    title: 'Home'
+                    title: 'Home',
+                    timings: result
                 }
             )
+        }
+
+        function getTimings()
+        {
+            var mysql = require('mysql')
+            var dbconfig = require('./config/database')
+            var connection = mysql.createConnection(dbconfig.connection)
+
+            connection.query('USE ' + dbconfig.database)
+
+            var sql = 'SELECT timings.day, timings.time, rooms.name AS room_name, subjects.name AS subject_name, ' +
+                'subjects.abbrev, subjects.course, subjects.stream, subjects.batch\n' +
+                'FROM timings, rooms, subjects, assignments\n' +
+                'WHERE assignments.uid=' + req.user.uid + '\n' +
+                'AND timings.sid=assignments.sid\n' +
+                'AND assignments.sid=subjects.sid\n' +
+                'AND timings.rid=rooms.rid\n' +
+                'ORDER BY day, time'
+
+            connection.query(sql,
+                function (err, result)
+                {
+                    callback(result)
+                }
+            )
+        }
     })
 
     /*
@@ -57,7 +98,7 @@ module.exports = function (app, passport)
     app.get('/create_user',
         function (req, res, next)
         {
-            if (req.ip === '::1' || req.user.type === 'admin')
+            if (req.ip === '::ffff:127.0.0.1' || req.ip === '::1' || req.user.type === 'admin')
                 res.render('create_user.ejs',
                     {
                         message: req.flash('signupMessage'),
@@ -114,18 +155,32 @@ module.exports = function (app, passport)
     app.post('/add_subject',
         function (req, res)
         {
-            // server side validation of form
+            var data = req.body
 
             // subject name validation
-            var name = req.body.name
+            var name = data.name
             if (name.length < 5 || name.length > 255)
             {
-                console.log('Subject name error')
                 req.flash('addSubjectMessage',
                     JSON.stringify(
                         {
                             status: 'error',
-                            message: 'Subject name should be between 5 to 255 characters!'
+                            message: 'Full subject name should be between 5 to 255 characters!'
+                        }
+                    )
+                )
+                res.redirect('/add_subject')
+                return
+            }
+
+            var abbrev = data.abbrev
+            if (abbrev.length < 2 || abbrev.length > 10)
+            {
+                req.flash('addSubjectMessage',
+                    JSON.stringify(
+                        {
+                            status: 'error',
+                            message: 'Abbreviated subject name should be between 2 to 10 characters!'
                         }
                     )
                 )
@@ -134,7 +189,7 @@ module.exports = function (app, passport)
             }
 
             // lectures per week validation
-            var lecPerWeek = req.body.lec_per_week
+            var lecPerWeek = data.lec_per_week
             if (parseInt(lecPerWeek) < 1 || parseInt(lecPerWeek) > 5)
             {
                 console.log('lectures per week error')
@@ -151,13 +206,12 @@ module.exports = function (app, passport)
             }
 
             // batch validation
-            var batch = req.body.batch
+            var batch = data.batch
             var dt = new Date()
             var max = dt.getYear() + 1900
             var min = max - 4
             if (parseInt(batch) < min || parseInt(batch) > max)
             {
-                console.log('batch error')
                 req.flash('addSubjectMessage',
                     JSON.stringify(
                         {
@@ -176,13 +230,13 @@ module.exports = function (app, passport)
 
             connection.query('USE ' + dbconfig.database)
 
-            var sql = 'INSERT INTO subjects (name, course, stream, lec_per_week, batch) VALUES ?'
+            var sql = 'INSERT INTO subjects (name, abbrev, course, stream, lec_per_week, batch) VALUES ?'
             var values = []
             var streams = ['none', 'csc', 'cse', 'me', 'ece', 'ce']
             for (var i = 0; i < streams.length; i++)
-                if (streams[i] in req.body)
-                    values.push([req.body.name, req.body.course, streams[i], req.body.lec_per_week,
-                        req.body.batch])
+                if (streams[i] in data)
+                    values.push([data.name, data.abbrev, data.course, streams[i], data.lec_per_week,
+                        data.batch])
 
             var callback = function (result)
             {
@@ -229,66 +283,6 @@ module.exports = function (app, passport)
     /*
     ------------------------------------------------- ASSIGN SUBJECT ---------------------------------------------------
      */
-    app.get('/assign_subject',
-        function (req, res, next)
-        {
-            var mysql = require('mysql')
-            var dbconfig = require('./config/database')
-            var connection = mysql.createConnection(dbconfig.connection)
-
-            connection.query('USE ' + dbconfig.database)
-
-            var sql = 'SELECT * FROM users WHERE type=\'faculty\' ORDER BY name'
-
-            var callback2 = function (faculty, subjects)
-            {
-                if (!req.isAuthenticated())
-                {
-                    res.redirect('/')
-                    return
-                }
-
-                if (req.user.type === 'po')
-                    res.render('assign_subject.ejs',
-                        {
-                            title: 'Assign Subject',
-                            user: req.user,
-                            message: req.flash('assignSubjectMessage'),
-                            faculty: faculty,
-                            subjects: subjects
-                        }
-                    )
-                else
-                {
-                    var error = new Error('Access Denied!')
-                    error.status = 401
-                    next(error)
-                }
-
-                connection.end()
-            }
-
-            var callback1 = function (result)
-            {
-                sql = 'SELECT * FROM subjects'
-                connection.query(sql,
-                    function (err, result2)
-                    {
-                        callback2(result, result2)
-                    }
-                )
-            }
-
-            connection.query(sql,
-                function (err, result)
-                {
-                    callback1(result)
-                }
-            )
-
-        }
-    )
-
     app.post('/assign_subject',
         function (req, res)
         {
@@ -301,7 +295,7 @@ module.exports = function (app, passport)
             connection.query('USE ' + dbconfig.database)
 
             var sql = 'INSERT INTO assignments (uid, sid) VALUES ?'
-            var values = [[data.faculty, data.name]]
+            var values = [[data.faculty, data.id]]
 
             var callback = function (result)
             {
@@ -326,7 +320,7 @@ module.exports = function (app, passport)
 
                 connection.end()
 
-                res.redirect('/assign_subject')
+                res.redirect('/view_subjects')
             }
 
             connection.query(sql, [values], function (err, result)
@@ -365,24 +359,43 @@ module.exports = function (app, passport)
 
                 connection.query('USE ' + dbconfig.database)
 
-                var sql = 'SELECT * FROM subjects'
+                var sql = 'SELECT subjects.sid, subjects.name AS subject_name, subjects.batch, subjects.course, ' +
+                    'subjects.stream, users.name AS user_name\n' +
+                    'FROM subjects\n' +
+                    'LEFT JOIN assignments\n' +
+                    '   INNER JOIN users\n' +
+                    '   ON assignments.uid = users.uid\n' +
+                    'ON subjects.sid = assignments.sid\n' +
+                    'ORDER BY subject_name'
 
-                var callback = function (result)
+                var callback2 = function (faculty, subjects)
                 {
                     res.render('view_subjects.ejs',
                         {
                             title: 'View Subjects',
                             user: req.user,
-                            subjects: result
+                            subjects: subjects,
+                            faculty: faculty
                         }
                     )
                     connection.end()
                 }
 
+                var callback1 = function (result)
+                {
+                    sql = 'SELECT * FROM users WHERE type=\'faculty\' ORDER BY name'
+
+                    connection.query(sql, function (err, result2)
+                        {
+                            callback2(result2, result)
+                        }
+                    )
+                }
+
                 connection.query(sql,
                     function (err, result)
                     {
-                        callback(result)
+                        callback1(result)
                     }
                 )
             }

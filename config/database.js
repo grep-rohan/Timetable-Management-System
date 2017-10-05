@@ -8,6 +8,5 @@ module.exports =
                 'user': process.env.DB_USER,
                 'password': process.env.DB_PASS
             },
-        'database': process.env.DB_NAME,
-        'users_table': process.env.DB_USERS_TABLE
+        'database': process.env.DB_NAME
     }

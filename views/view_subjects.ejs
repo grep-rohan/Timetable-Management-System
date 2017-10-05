@@ -4,6 +4,28 @@
     <% include ./partials/head.ejs %>
 </head>
 <body>
+<!--js scripts-->
+<script type="text/javascript">
+    function filter()
+    {
+        var input, filter, table, tr, td, i
+        input = document.getElementById('filter')
+        filter = input.value.toUpperCase()
+        table = document.getElementById('table')
+        tr = table.getElementsByTagName('tr')
+        for (i = 0; i < tr.length; i++)
+        {
+            td = tr[i].getElementsByTagName('td')[0]
+            if (td)
+                if (td.innerHTML.toUpperCase().indexOf(filter) > -1)
+                    tr[i].style.display = ''
+                else
+                    tr[i].style.display = 'none'
+        }
+    }
+
+</script>
+
 <!--navbar-->
 <header>
     <% include ./partials/navbar.ejs %>
@@ -11,24 +33,96 @@
 
 <!--main container-->
 <div class="w3-container w3-padding-64 w3-display-topmiddle w3-threequarter" id="container">
+    <!--filter-->
+    <input class="w3-input w3-margin-bottom w3-animate-input" type="text" placeholder="Search for subjects.."
+           id="filter"
+           onkeyup="filter()" style="width: 30%">
+
+    <!--table-->
     <div class="w3-responsive">
-        <table class="w3-table-all w3-card-4 w3-hoverable">
-            <tr class="w3-blue">
-                <th>Subject Name</th>
-                <th>Batch</th>
-                <th>Course</th>
-                <th>Stream</th>
+        <table class="w3-table w3-bordered w3-hoverable" id="table">
+            <tr>
+                <th class="w3-border-right">Subject</th>
+                <th class="w3-border-right">Batch</th>
+                <th class="w3-border-right">Course</th>
+                <th class="w3-border-right">Stream</th>
+                <th>Faculty</th>
             </tr>
             <% for(i = 0; i < subjects.length; i++) {
                 var curSub = subjects[i] %>
             <tr>
-                <td><%= curSub.name %></td>
-                <td><%= curSub.batch %></td>
-                <td><%= curSub.course %></td>
-                <td><%= curSub.stream %></td>
+                <td class="w3-border-right"><%= curSub.subject_name %></td>
+                <td class="w3-border-right"><%= curSub.batch %></td>
+                <td class="w3-border-right"><%= curSub.course %></td>
+                <td class="w3-border-right"><%= curSub.stream %></td>
+                <% var user_name = curSub.user_name
+                if(user_name) { %>
+                <td><%= user_name %></td>
+                <% } else { %>
+                <td>
+                    <button class="w3-btn w3-round w3-tiny w3-blue"
+                            id="{&quot;sid&quot;:&quot;<%= curSub.sid %>&quot;,&quot;name&quot;:&quot;<%= curSub.subject_name %>&quot;}">
+                        Assign
+                    </button>
+                </td>
+                <% } %>
             </tr>
             <% } %>
+            <script type="text/javascript">
+                var buttons = document.getElementsByTagName('button')
+                for (var i = 0; i < buttons.length; i++)
+                    buttons[i].onclick = function (e)
+                    {
+                        var assign = document.getElementById('assign_modal')
+                        assign.style.display = 'block'
+
+                        var obj = JSON.parse(this.id)
+
+                        var name = document.getElementById('name')
+                        name.value = obj.name
+                        var id = document.getElementById('id')
+                        id.value = obj.sid
+                    }
+            </script>
         </table>
+    </div>
+</div>
+
+<!--assign form modal-->
+<div id="assign_modal" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-top">
+        <form action="/assign_subject" method="post"
+              class="w3-padding w3-border w3-card-4" id="form">
+            <div class="w3-center">
+                <span onclick="document.getElementById('assign_modal').style.display='none'"
+                      class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+            </div>
+            <h3>Assign Subject</h3>
+
+            <label>
+                <input type="text" name="id" id="id" required style="display: none">
+            </label>
+
+            <label>Subject<span class="w3-text-red">*</span></label>
+            <label>
+                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="name" id="name" required
+                       disabled>
+            </label>
+
+            <label>Faculty<span class="w3-text-red">*</span></label>
+            <label>
+                <select class="w3-select w3-border w3-round" required name="faculty">
+                    <option value=""></option>
+                    <% for(var i = 0; i < faculty.length; i++) { %>
+                    <option value=<%= faculty[i].uid %>><%= faculty[i].name %></option>
+                    <% } %>
+                </select>
+            </label>
+
+            <br><br>
+
+            <button type="submit" class="w3-btn w3-round w3-blue">Assign Subject</button>
+        </form>
     </div>
 </div>
 </body>

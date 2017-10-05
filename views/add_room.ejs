@@ -24,25 +24,11 @@
 <!--main container-->
 <div class="w3-container w3-padding-64 w3-third w3-display-topmiddle" id="container">
     <!--flash message-->
-    <% if (message.length > 0) {
-        var obj = JSON.parse(message)
-    if(obj.status === 'error') { %>
-    <div class="w3-panel w3-red w3-card w3-padding-16 w3-display-container">
-        <span onclick="this.parentElement.style.display='none'"
-              class="w3-button w3-display-topright w3-hov">&times;</span>
-        <%= obj.message %>
-    </div>
-    <% } else { %>
-    <div class="w3-panel w3-green w3-card w3-padding-16 w3-display-container">
-        <span onclick="this.parentElement.style.display='none'"
-              class="w3-button w3-display-topright w3-hov">&times;</span>
-        <%= obj.message %>
-    </div>
-    <% }} %>
+    <% include ./partials/flash_message.ejs %>
 
     <!--form-->
     <form action="/add_room" method="post"
-          class="w3-container w3-padding-16 w3-light-grey w3-round w3-border w3-card-4" id="form">
+          class="w3-container w3-padding w3-light-grey w3-round w3-border w3-card-4" id="form">
         <h2>Add Room</h2>
 
         <label>Room Name<span class="w3-text-red">*</span></label>

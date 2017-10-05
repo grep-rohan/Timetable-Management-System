@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include ./partials/head.ejs %>
+</head>
+<body>
+<!--navbar-->
+<header>
+    <% include ./partials/navbar.ejs %>
+</header>
+
+<!--main container-->
+<div class="w3-container w3-padding-64 w3-center" id="container">
+    <!--time table-->
+    <div class="w3-responsive">
+        <table class="w3-bordered w3-table">
+            <tr>
+                <th></th>
+                <% var dt = new Date()
+                var hr = dt.getHours()
+                for(var i = 9; i <= 16; i++) {
+                if(i === hr) { %>
+                <th class="w3-border-left w3-center w3-text-blue"><%= i %>:00-<%= i + 1 %>:00</th>
+                <% } else { %>
+                <th class="w3-border-left w3-center"><%= i %>:00-<%= i + 1 %>:00</th>
+                <% }} %>
+            </tr>
+
+            <% var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+            var day = dt.getDay() - 1
+            for(i = 0; i < 5; i++) { %>
+            <tr>
+                <% if(i === day) { %>
+                <th class="w3-text-blue w3-center"><%= days[i] %></th>
+                <% } else { %>
+                <th class="w3-center"><%= days[i] %></th>
+                <% } %>
+                <% for(var j = 9; j <= 16; j++) {
+                    var free = true
+                    var index
+                    for (var k = 0; k < timings.length; k++)
+                    {
+                        if (timings[k].day === i && timings[k].time === j)
+                        {
+                            free = false
+                            index = k
+                            break
+                        }
+                    }
+                if(day === i || j === hr){
+                if(free) { %>
+                <td class="w3-text-blue w3-center w3-border-left"><b>Free</b></td>
+                <% } else { %>
+                <td class="w3-text-red w3-center w3-border-left w3-tooltip">
+                        <span style="position:absolute; font-size: 14px" class="w3-text w3-tag w3-round">
+                        <%= timings[index].course %>
+                            <br>
+                            <% if(timings[index].course === 'btech') { %>
+                            <%= timings[index].stream %>
+                            <% } %>
+                            <br>
+                            <%= timings[index].batch %>
+                    </span>
+                    <span style="font-size: 16px; "><b><%= timings[index].abbrev %></b></span>
+                    <span style="font-size: 14px; "><%= timings[index].room_name %></span>
+                </td>
+                <% }} else {
+                if(free) {
+                %>
+                <td class="w3-text-green w3-center w3-border-left">Free</td>
+                <% } else { %>
+                <td class="w3-text-teal w3-center w3-border-left w3-tooltip">
+                        <span style="position:absolute; font-size: 14px" class="w3-text w3-tag w3-round">
+                        <%= timings[index].course %>
+                            <br>
+                            <% if(timings[index].course === 'btech') { %>
+                            <%= timings[index].stream %>
+                            <% } %>
+                            <br>
+                            <%= timings[index].batch %>
+                    </span>
+                    <span style="font-size: 16px; "><b><%= timings[index].abbrev %></b></span>
+                    <span style="font-size: 14px; "><%= timings[index].room_name %></span>
+                </td>
+                <% }}} %>
+            </tr>
+            <% } %>
+        </table>
+    </div>
+
+    <!--abbreviations-->
+    <div class="w3-margin-top w3-container w3-center w3-responsive" style="display: inline-block">
+        <h4>Abbreviations</h4>
+        <table class="w3-table w3-bordered">
+            <tr>
+                <% var subs = new Set()
+                for(i = 0; i < timings.length; i++) {
+                    var sub_name = timings[i].subject_name
+                if(!subs.has(sub_name)) {
+                    subs.add(sub_name) %>
+                <td class="w3-border-right"><%= timings[i].abbrev %></td>
+                <td><%= sub_name %></td>
+                <% }} %>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

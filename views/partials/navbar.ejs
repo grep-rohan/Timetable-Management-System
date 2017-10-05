@@ -2,49 +2,40 @@
     function showDropdown()
     {
         var x = document.getElementById('dropdown')
-        if (x.className.indexOf("w3-show") === -1)
-            x.className += " w3-show"
+        if (x.className.indexOf('w3-show') === -1)
+            x.className += ' w3-show'
         else
-            x.className = x.className.replace(" w3-show", "")
+            x.className = x.className.replace(' w3-show', '')
 
     }
 
     window.onload = function ()
     {
         var navbar = document.getElementById('navbar')
-        console.log(navbar.offsetHeight)
         var container = document.getElementById('container')
-        console.log(container.style.marginTop)
         container.style.marginTop = navbar.offsetHeight.toString() + 'px'
-        console.log(container.style.marginTop)
     }
 </script>
 
 <div class="w3-top" id="navbar">
-    <div class="w3-bar w3-black w3-card-4">
-        <a href="/" class="w3-bar-item w3-button"><i class="fa fa-home" style="color: white"></i> Home</a>
+    <div class="w3-bar w3-border-bottom">
+        <a href="/" class="w3-bar-item w3-button" title="Home"><i class="fa fa-home"></i></a>
 
         <% if(user.type === 'po') { %>
         <div class="w3-dropdown-click">
-            <button class="w3-button" onclick="showDropdown()">
-                <i class="fa fa-bars" style="color: white"></i> Options <i class="fa fa-caret-down"></i>
-            </button>
+            <div class="w3-button" onclick="showDropdown()" title="Options"><i class="fa fa-bars"></i></div>
 
             <div id="dropdown" class="w3-dropdown-content w3-bar-block w3-card-4">
                 <a href="/add_subject" class="w3-bar-item w3-button">Add Subject</a>
 
                 <a href="/view_subjects" class="w3-bar-item w3-button">View Subjects</a>
 
-                <a href="/assign_subject" class="w3-bar-item w3-button">Assign Subject</a>
-
                 <a href="/add_room" class="w3-bar-item w3-button">Add Room</a>
             </div>
         </div>
         <% } else if(user.type === 'faculty') { %>
         <div class="w3-dropdown-click">
-            <button class="w3-button" onclick="showDropdown()">
-                Options <i class="fa fa-caret-down"></i>
-            </button>
+            <button class="w3-button" onclick="showDropdown()"><i class="fa fa-bars"></i></button>
 
             <div id="dropdown" class="w3-dropdown-content w3-bar-block w3-card-4">
                 <a href="/my_subjects" class="w3-bar-item w3-button">My Subjects</a>
@@ -52,11 +43,8 @@
         </div>
         <% } %>
 
-        <a href="/logout" class="w3-bar-item w3-button w3-right"><i class="fa fa-sign-out"
-                                                                              style="color: white"></i>
-            Logout</a>
+        <a href="/logout" class="w3-bar-item w3-button w3-right" title="Logout"><i class="fa fa-sign-out"></i></a>
 
-        <span class="w3-bar-item w3-right"><i class="fa fa-user"
-                                                        style="color: white"></i> <%= user.name %></span>
+        <span class="w3-bar-item w3-right"><i class="fa fa-user"></i> <%= user.name %></span>
     </div>
 </div>
