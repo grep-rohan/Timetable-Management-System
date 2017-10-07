@@ -1,7 +1,11 @@
 <!doctype html>
 <html>
 <head>
-    <% include ./partials/head.ejs %>
+    <title>BMU : <%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">-->
+    <link rel="stylesheet" href="/public/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
@@ -11,7 +15,7 @@
     function updateStream()
     {
         var course = document.getElementById('course')
-        if (course.options[course.selectedIndex].value === 'btech')
+        if(course.options[course.selectedIndex].value === 'btech')
         {
             document.getElementById('stream').style.display = 'block'
             document.getElementById('none').checked = false
@@ -32,12 +36,12 @@
 
     }
 
-    jQuery(function ($)
+    jQuery(function($)
     {
-        $('#form').submit(function (e)
+        $('#form').submit(function(e)
         {
             //check atleat 1 checkbox is checked
-            if (!$('.w3-check').is(':checked'))
+            if(!$('.w3-check').is(':checked'))
             {
                 alert('Choose atleast 1 stream! ')
                 e.preventDefault()
@@ -47,9 +51,7 @@
 </script>
 
 <!--navbar-->
-<header>
-    <% include ./partials/navbar.ejs %>
-</header>
+<% include ./partials/navbar.ejs %>
 
 <!--main container-->
 <div class="w3-container w3-padding-64 w3-third w3-display-topmiddle" id="container">

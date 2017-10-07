@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <% include ./partials/head.ejs %>
-</head>
+<!--head-->
+<% include ./partials/head.ejs %>
 <body>
 <!--navbar-->
-<header>
-    <% include ./partials/navbar.ejs %>
-</header>
+<% include ./partials/navbar.ejs %>
 
 <!--main container-->
-<div class="w3-container w3-padding-64" id="container">
+<div class="w3-container w3-padding-64 w3-center" id="container">
     <!--time table-->
     <div class="w3-responsive" style="padding-bottom: 50px">
         <table class="w3-bordered w3-table">
@@ -49,14 +46,8 @@
                 <% } else { %>
                 <td class="w3-red w3-center w3-tooltip">
                         <span style="position:absolute; font-size: 14px" class="w3-text w3-tag w3-round">
-                        <%= timings[index].course %>
-                            <br>
-                            <% if(timings[index].course === 'btech') { %>
-                            <%= timings[index].stream %>
-                            <% } %>
-                            <br>
-                            <%= timings[index].batch %>
-                    </span>
+                            <%= timings[index].user_name %>
+                        </span>
                     <span style="font-size: 16px; "><b><%= timings[index].abbrev %></b></span>
                     <span style="font-size: 14px; "><%= timings[index].room_name %></span>
                 </td>
@@ -67,14 +58,8 @@
                 <% } else { %>
                 <td class="w3-yellow w3-center w3-tooltip w3-border">
                         <span style="position:absolute; font-size: 14px" class="w3-text w3-tag w3-round">
-                        <%= timings[index].course %>
-                            <br>
-                            <% if(timings[index].course === 'btech') { %>
-                            <%= timings[index].stream %>
-                            <% } %>
-                            <br>
-                            <%= timings[index].batch %>
-                    </span>
+                            <%= timings[index].user_name %>
+                        </span>
                     <span style="font-size: 16px; "><b><%= timings[index].abbrev %></b></span>
                     <span style="font-size: 10px; "><%= timings[index].room_name %></span>
                 </td>
@@ -90,7 +75,7 @@
         <table class="w3-table w3-bordered w3-hoverable">
             <% var subs = new Set()
             for(i = 0; i < timings.length; i++) {
-                var sub_name = timings[i].subject_name
+                var sub_name = timings[i].name
             if(!subs.has(sub_name)) {
                 subs.add(sub_name) %>
             <tr>

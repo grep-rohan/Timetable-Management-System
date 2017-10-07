@@ -52,16 +52,18 @@ module.exports = function(app)
                     '      WHERE cnt < lec_per_week\n' +
                     '      UNION\n' +
                     '      SELECT DISTINCT subjects.*, 0 AS cnt\n' +
-                    '      FROM subjects, assignments, timings\n' +
-                    '      WHERE assignments.uid = ' + req.user.uid + '\n' +
+                    '      FROM subjects, assignments\n' +
+                    '      WHERE subjects.sid NOT IN (SELECT DISTINCT sid FROM timings)\n' +
                     '      AND assignments.sid = subjects.sid\n' +
-                    '      AND subjects.sid NOT IN (SELECT DISTINCT sid\n' +
-                    '                               FROM timings)) AS t\n' +
+                    '      AND assignments.uid = ' + req.user.uid + ') AS t\n' +
                     'ORDER BY cnt, name'
+
+                console.log(sql)
 
                 connection.query(sql,
                     function(err, result2)
                     {
+                        console.log(err, result2)
                         callback2(result, result2)
                     }
                 )
@@ -82,9 +84,12 @@ module.exports = function(app)
                 'AND timings.rid=rooms.rid\n' +
                 'ORDER BY subject_name'
 
+            console.log(sql)
+
             connection.query(sql,
                 function(err, result)
                 {
+                    console.log(err, result)
                     callback1(result, connection)
                 }
             )
@@ -94,11 +99,39 @@ module.exports = function(app)
         {
             var mysql = require('mysql')
             var dbconfig = require('../config/database')
-            var connection = mysql.createConnection(dbconfig.connection)
+            var connection = mysql.createConnection(dbconfig.connection), sql
 
             connection.query('USE ' + dbconfig.database)
 
             sql = 'SELECT * FROM students WHERE uid = ' + req.user.uid
+
+            var callback = function()
+            {
+                sql = 'SELECT subjects.name, subjects.abbrev, rooms.name AS room_name, timings.day, timings.time, users.name AS user_name\n' +
+                    'FROM subjects, rooms, students, timings, users, assignments\n' +
+                    'WHERE students.uid = ' + req.user.uid + '\n' +
+                    'AND subjects.course = students.course\n' +
+                    'AND subjects.stream = students.stream\n' +
+                    'AND subjects.batch = students.batch\n' +
+                    'AND subjects.sid = timings.sid\n' +
+                    'AND timings.rid = rooms.rid\n' +
+                    'AND assignments.sid = subjects.sid\n' +
+                    'AND users.uid = assignments.uid\n' +
+                    'ORDER BY day, time'
+
+                connection.query(sql,
+                    function(err, result)
+                    {
+                        res.render('home_student.ejs',
+                            {
+                                title: 'Home',
+                                user: req.user,
+                                timings: result
+                            }
+                        )
+                    }
+                )
+            }
 
             connection.query(sql,
                 function(err, result)
@@ -111,12 +144,7 @@ module.exports = function(app)
                             }
                         )
                     else
-                        res.render('home_student.ejs',
-                            {
-                                title: 'Home',
-                                user: req.user
-                            }
-                        )
+                        callback()
                 }
             )
         }
@@ -156,7 +184,7 @@ module.exports = function(app)
             var values = [[req.user.uid, data.course, data.stream, data.batch]]
 
             connection.query(sql, [values],
-                function(err, result)
+                function()
                 {
                     res.redirect('/')
                 }
