@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include ./partials/head.ejs %>
+</head>
+<body>
+<!--navbar-->
+<header>
+    <% include ./partials/navbar.ejs %>
+</header>
+
+<!--main container-->
+<div class="w3-container w3-padding-64 w3-center" id="container">
+    <h2>Choose Time Slot</h2>
+    <!--about subject-->
+    <div class="w3-panel w3-padding w3-margin-bottom w3-leftbar w3-lime" style="display: inline-block">
+        <%= curSub.name %> - <%= curSub.batch %> - <%= curSub.course %>
+        <% if(curSub.stream != 'none') { %>
+        - <%= curSub.stream %>
+        <% } %>
+    </div>
+
+    <!--time table-->
+    <div class="w3-responsive w3-margin-top">
+        <table class="w3-bordered w3-table">
+            <tr>
+                <th></th>
+                <% for(var i = 9; i <= 16; i++) { %>
+                <th class="w3-border-left w3-center"><%= i %>:00-<%= i + 1 %>:00</th>
+                <% } %>
+            </tr>
+
+            <% var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+            for(i = 0; i < 5; i++) { %>
+            <tr>
+                <th class="w3-center"><%= days[i] %></th>
+                <% for(var j = 9; j <= 16; j++) {
+                    var free = true
+                    for(var k = 0; k < mySchedule.length; k++)
+                    {
+                        var cur = mySchedule[k]
+                        if(cur.day === i && cur.time === j)
+                        {
+                            free = false
+                            break
+                        }
+                    }
+                    if(free)
+                    {
+                        for(k = 0; k < theirSchedule.length; k++)
+                        {
+                            cur = theirSchedule[k]
+                            if(cur.day === i && cur.time === j)
+                            {
+                                free = false
+                                break
+                            }
+                        }
+                    }
+                if(free) {
+                %>
+                <td class="w3-border-left w3-green w3-center w3-hover-light-green">
+                    <form action="/get_rooms" method="post">
+                        <label>
+                            <input class="w3-hide" name="day" value=<%= i %>>
+                        </label>
+
+                        <label>
+                            <input class="w3-hide" name="time" value="<%= j %>">
+                        </label>
+
+                        <button type="submit"
+                                class="w3-padding-small w3-button w3-border-0 w3-hover-light-green w3-transparent w3-small">
+                            <u>Free</u>
+                        </button>
+                    </form>
+                </td>
+                <% } else { %>
+                <td class="w3-border-left w3-red w3-center">Not Free</td>
+                <% }} %>
+            </tr>
+            <% } %>
+        </table>
+    </div>
+
+    <!--choose room modal-->
+    <div id="room_modal" class="w3-modal w3-left-align">
+        <div class="w3-modal-content w3-card-4 w3-animate-top">
+            <form action="/add_timing" method="post" class="w3-padding w3-border w3-card-4" id="form">
+                <div class="w3-center">
+                <span onclick="document.getElementById('room_modal').style.display='none'"
+                      class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+                </div>
+                <h3>Choose Room</h3>
+
+                <input type="hidden" name="sid" value=<%= curSub.sid %>>
+
+                <input type="hidden" name="day" value=<%= day %>>
+
+                <input type="hidden" name="time" value=<%= time %>>
+
+                <label>Day<span class="w3-text-red">*</span></label>
+                <label>
+                    <input class="w3-input w3-disabled w3-round w3-border" id="day" disabled>
+                </label>
+
+                <label>Time<span class="w3-text-red">*</span></label>
+                <label>
+                    <input class="w3-input w3-disabled w3-round w3-border" id="time" disabled>
+                </label>
+
+                <label>Room<span class="w3-text-red">*</span></label>
+                <label>
+                    <% if(typeof availableRooms !== 'undefined') { %>
+                    <select class="w3-input w3-border w3-round" name="rid" required>
+                        <option></option>
+                        <% for(i = 0; i < availableRooms.length; i++) {
+                            cur = availableRooms[i] %>
+                        <option value=<%= cur.rid %>><%= cur.name %></option>
+                        <% } %>
+                    </select>
+
+                    <br>
+
+                    <button type="submit" class="w3-btn w3-round w3-blue">Select</button>
+                    <% } else { %>
+                    <input class="w3-input w3-disabled w3-border w3-round" disabled
+                           value="No Available Rooms in this time slot">
+
+                    <br>
+
+                    <button class="w3-btn w3-round w3-blue w3-disabled" disabled>Select</button>
+                    <% } %>
+                </label>
+            </form>
+        </div>
+    </div>
+
+    <% if(typeof day !== 'undefined') { %>
+    <script type="text/javascript">
+        document.getElementById('room_modal').style.display = 'block'
+
+        var days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+        var day = document.getElementById('day')
+        day.value = days[<%= day %>]
+        var time = document.getElementById('time')
+        time.value = (<%= time %>).toString() + ':00-' + (<%= parseInt(time) + 1 %>).toString() + ':00'
+    </script>
+    <% } %>
+</div>
+</body>
+</html>

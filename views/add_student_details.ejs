@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include ./partials/head.ejs %>
+</head>
+<body>
+<!--js scripts-->
+<script type="text/javascript">
+    function addOption(domObj, value)
+    {
+        var objOption = document.createElement('option');
+        objOption.text = value;
+        objOption.value = value;
+
+        domObj.options.add(objOption);
+    }
+
+    function clearSelect(domObj)
+    {
+        for(var i = domObj.options.length - 1; i > 0; i--)
+            domObj.remove(i)
+    }
+
+    // change visibility of streams based on selected course
+    function updateStream()
+    {
+        var course = document.getElementById('course')
+        var stream = document.getElementById('stream')
+        if(course.options[course.selectedIndex].value === 'btech')
+        {
+            document.getElementById('streamdiv').style.display = 'block'
+            clearSelect(stream)
+            var streams = ['csc', 'cse', 'me', 'ece', 'ce']
+            for(var i = 0; i < streams.length; i++)
+                addOption(stream, streams[i])
+        }
+        else
+        {
+            document.getElementById('streamdiv').style.display = 'none'
+            clearSelect(stream)
+            addOption(stream, 'none')
+            stream.selectedIndex = '1'
+        }
+    }
+
+    // allow only number input
+    function isNumber(evt)
+    {
+        evt = (evt) ? evt : window.event
+        var charCode = (evt.which) ? evt.which : evt.keyCode
+        return !(charCode > 31 && (charCode < 48 || charCode > 57))
+
+    }
+
+
+</script>
+
+<!--navbar-->
+<header>
+    <% include ./partials/navbar.ejs %>
+</header>
+
+<!--main container-->
+<div class="w3-container w3-padding-64 w3-third w3-display-topmiddle" id="container">
+    <!--form-->
+    <form action="/add_student_details" method="post"
+          class="w3-container w3-padding w3-light-grey w3-round w3-border w3-card-4" id="form">
+        <h2>Add Details</h2>
+
+        <label>Course<span class="w3-text-red">*</span></label>
+        <label>
+            <label>
+                <select class="w3-select w3-border w3-round" name="course" required onchange="updateStream()"
+                        id="course">
+                    <option value=""></option>
+                    <option value="bba">BBA</option>
+                    <option value="bcomm">B.Comm</option>
+                    <option value="btech">B.Tech</option>
+                    <option value="mba">MBA</option>
+                </select>
+            </label>
+        </label>
+
+        <div id="streamdiv" style="display: none">
+            <label>Stream<span class="w3-text-red">*</span></label>
+            <label>
+                <select class="w3-select w3-round w3-border" name="stream" id="stream" required>
+                    <option></option>
+                </select>
+            </label>
+        </div>
+
+        <label>Batch<span class="w3-text-red">*</span></label>
+        <label>
+            <input type="number" class="w3-input w3-border w3-round" name="batch" required
+                   onkeypress="return isNumber(event)" min="" max="" id="batch">
+        </label>
+
+        <script type="text/javascript">
+            // set input constraints for batch
+            var dt = new Date()
+            var maxYear = dt.getYear() + 1900
+            var minYear = maxYear - 4
+            var batch = document.getElementById('batch')
+            batch.setAttribute('max', maxYear.toString())
+            batch.setAttribute('min', minYear.toString())
+        </script>
+
+        <br>
+
+        <button type="submit" class="w3-btn w3-round w3-blue">Submit</button>
+    </form>
+</div>
+</body>
+</html>

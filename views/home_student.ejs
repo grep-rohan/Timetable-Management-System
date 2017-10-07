@@ -10,28 +10,7 @@
 </header>
 
 <!--main container-->
-<div class="w3-container w3-padding-64 w3-center" id="container">
-    <!--incomplete subjects-->
-    <div class="w3-margin-bottom w3-left-align" style="display: inline-block">
-        <% for(var i = 0; i < incomplete_subs.length; i++) {
-            var cur = incomplete_subs[i] %>
-        <form method="post" action="/get_subject"
-              class="w3-panel w3-leftbar w3-khaki w3-padding w3-margin-bottom">
-            Add <%= cur.lec_per_week - cur.cnt %> more lecture(s) of <%= cur.name %> of <%= cur.batch %>
-            - <%= cur.course %>
-            <% if(cur.course) { %>
-            - <%= cur.stream %>
-            <% } %>
-            &nbsp;
-
-            <label>
-                <input type="hidden" name="sid" value=<%= cur.sid %>>
-            </label>
-            <button class="w3-btn w3-blue w3-tiny w3-round" type="submit">Add</button>
-        </form>
-        <% } %>
-    </div>
-
+<div class="w3-container w3-padding-64" id="container">
     <!--time table-->
     <div class="w3-responsive" style="padding-bottom: 50px">
         <table class="w3-bordered w3-table">

@@ -2,23 +2,23 @@
     function showDropdown()
     {
         var x = document.getElementById('dropdown')
-        if (x.className.indexOf('w3-show') === -1)
+        if(x.className.indexOf('w3-show') === -1)
             x.className += ' w3-show'
         else
             x.className = x.className.replace(' w3-show', '')
 
     }
 
-    window.onload = function ()
+    window.onload = function()
     {
         var navbar = document.getElementById('navbar')
         var container = document.getElementById('container')
-        container.style.marginTop = navbar.offsetHeight.toString() + 'px'
+        container.style.marginTop = (navbar.clientHeight - 25).toString() + 'px'
     }
 </script>
 
 <div class="w3-top" id="navbar">
-    <div class="w3-bar w3-border-bottom">
+    <div class="w3-bar w3-border-bottom w3-white w3-card">
         <a href="/" class="w3-bar-item w3-button" title="Home"><i class="fa fa-home"></i></a>
 
         <% if(user.type === 'po') { %>

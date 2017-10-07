@@ -13,17 +13,16 @@
         filter = input.value.toUpperCase()
         table = document.getElementById('table')
         tr = table.getElementsByTagName('tr')
-        for (i = 0; i < tr.length; i++)
+        for(i = 0; i < tr.length; i++)
         {
             td = tr[i].getElementsByTagName('td')[0]
-            if (td)
-                if (td.innerHTML.toUpperCase().indexOf(filter) > -1)
+            if(td)
+                if(td.innerHTML.toUpperCase().indexOf(filter) > -1)
                     tr[i].style.display = ''
                 else
                     tr[i].style.display = 'none'
         }
     }
-
 </script>
 
 <!--navbar-->
@@ -35,8 +34,7 @@
 <div class="w3-container w3-padding-64 w3-display-topmiddle w3-threequarter" id="container">
     <!--filter-->
     <input class="w3-input w3-margin-bottom w3-animate-input" type="text" placeholder="Search for subjects.."
-           id="filter"
-           onkeyup="filter()" style="width: 30%">
+           id="filter" onkeyup="filter()" style="width: 30%">
 
     <!--table-->
     <div class="w3-responsive">
@@ -70,8 +68,8 @@
             <% } %>
             <script type="text/javascript">
                 var buttons = document.getElementsByTagName('button')
-                for (var i = 0; i < buttons.length; i++)
-                    buttons[i].onclick = function (e)
+                for(var i = 0; i < buttons.length; i++)
+                    buttons[i].onclick = function(e)
                     {
                         var assign = document.getElementById('assign_modal')
                         assign.style.display = 'block'
@@ -97,7 +95,7 @@
                 <span onclick="document.getElementById('assign_modal').style.display='none'"
                       class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
             </div>
-            <h3>Assign Subject</h3>
+            <h3>Assign Faculty</h3>
 
             <label>
                 <input type="text" name="id" id="id" required style="display: none">
@@ -121,7 +119,7 @@
 
             <br><br>
 
-            <button type="submit" class="w3-btn w3-round w3-blue">Assign Subject</button>
+            <button type="submit" class="w3-btn w3-round w3-blue">Assign</button>
         </form>
     </div>
 </div>

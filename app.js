@@ -34,16 +34,26 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
 
-require('./routes.js')(app, passport)
+// routes
+require('./routes/index.js')(app, passport)
+require('./routes/login.js')(app, passport)
+require('./routes/logout.js')(app, passport)
+require('./routes/create_user.js')(app, passport)
+require('./routes/add_subject.js')(app, passport)
+require('./routes/assign_subject.js')(app, passport)
+require('./routes/view_subjects.js')(app, passport)
+require('./routes/my_subjects.js')(app, passport)
+require('./routes/add_room.js')(app, passport)
+require('./routes/add_lecture.js')(app, passport)
 
-app.use(function (req, res, next)
+app.use(function(req, res, next)
 {
     var err = new Error('Not Found')
     err.status = 404
     next(err)
 })
 
-app.use(function (err, req, res, next)
+app.use(function(err, req, res, next)
 {
     // set locals, only providing error in development
     res.locals.message = err.message
