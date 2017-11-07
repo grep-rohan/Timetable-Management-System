@@ -14,17 +14,46 @@
                 <th class="w3-border-right">Subject</th>
                 <th class="w3-border-right">Batch</th>
                 <th class="w3-border-right">Course</th>
-                <th>Stream</th>
+                <th>Stream(s)</th>
             </tr>
-            <% for(i = 0; i < subjects.length; i++) {
+            <%
+            for(var i = 0; i < subjects.length; i++)
+            {
                 var curSub = subjects[i] %>
-            <tr>
-                <td class="w3-border-right"><%= curSub.name %></td>
-                <td class="w3-border-right"><%= curSub.batch %></td>
-                <td class="w3-border-right"><%= curSub.course %></td>
-                <td><%= curSub.stream %></td>
+                <tr>
+                    <td class="w3-border-right"><%= curSub.name %></td>
+                    <td class="w3-border-right"><%= curSub.batch %></td>
+                    <td class="w3-border-right"><%= curSub.course.toUpperCase() %></td>
+            <%
+                if(curSub.combined === 0)
+                {
+            %>
+                    <td><%= curSub.streams.toUpperCase() %></td>
+            <%
+                }
+                else
+                {
+                    var streams = JSON.parse(curSub.streams)
+                    console.log(streams)
+            %>
+                    <td>
+            <%
+                    for(var j = 0; j < streams.length - 1; j++)
+                    {
+            %>
+                        <%= streams[j].toUpperCase() %>,
+            <%
+                    }
+            %>
+                    <%= streams[j].toUpperCase() %>
+                    </td>
+            <%
+                }
+            %>
             </tr>
-            <% } %>
+            <%
+            }
+            %>
         </table>
     </div>
 </div>

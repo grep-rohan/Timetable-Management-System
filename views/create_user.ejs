@@ -4,15 +4,13 @@
 <% include ./partials/head.ejs %>
 <body>
 <!--navbar-->
-<div class="w3-bar w3-black w3-card-4 w3-top">
-    <a href="/" class="w3-bar-item w3-button"><i class="fa fa-home" style="color: white"></i> Home</a>
-
-    <% if(typeof user !== 'undefined') { %>
-    <a href="/logout" class="w3-bar-item w3-button w3-right"><i class="fa fa-sign-out" style="color: white"></i> Logout</a>
-
-    <span class="w3-bar-item w3-right"><i class="fa fa-user" style="color: white"></i> <%= user.name %></span>
-    <% } %>
-</div>
+<header>
+    <div class="w3-top" id="navbar">
+        <div class="w3-bar w3-border-bottom w3-white w3-card">
+            <a href="/" class="w3-bar-item w3-button" title="Home"><i class="fa fa-home"></i></a>
+        </div>
+    </div>
+</header>
 
 <!--main container-->
 <div class="w3-container w3-padding-64 w3-third w3-display-topmiddle">
@@ -41,7 +39,7 @@
         <label>
             <input type="text" class="w3-input w3-border w3-round" name="name" required>
         </label>
-        <label>Username</label>
+        <label>Email</label>
         <label>
             <input type="text" class="w3-input w3-border w3-round" name="username" required>
         </label>

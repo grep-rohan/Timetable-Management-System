@@ -43,15 +43,9 @@ module.exports = function(app)
             connection.query(sql, [values], function(err, result)
             {
                 if(err)
-                {
-                    console.log(err.message)
                     callback(false)
-                }
                 else
-                {
-                    console.log(result.message)
                     callback(true)
-                }
             })
         }
     )

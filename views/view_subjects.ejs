@@ -43,26 +43,64 @@
                 <th class="w3-border-right">Stream</th>
                 <th>Faculty</th>
             </tr>
-            <% for(i = 0; i < subjects.length; i++) {
-                var curSub = subjects[i] %>
-            <tr>
-                <td class="w3-border-right"><%= curSub.subject_name %></td>
-                <td class="w3-border-right"><%= curSub.batch %></td>
-                <td class="w3-border-right"><%= curSub.course %></td>
-                <td class="w3-border-right"><%= curSub.stream %></td>
-                <% var user_name = curSub.user_name
-                if(user_name) { %>
-                <td><%= user_name %></td>
-                <% } else { %>
-                <td>
-                    <button class="w3-btn w3-round w3-tiny w3-blue"
-                            id="{&quot;sid&quot;:&quot;<%= curSub.sid %>&quot;,&quot;name&quot;:&quot;<%= curSub.subject_name %>&quot;}">
-                        Assign
-                    </button>
-                </td>
-                <% } %>
-            </tr>
-            <% } %>
+            <%
+            for(i = 0; i < subjects.length; i++)
+            {
+                var curSub = subjects[i]
+            %>
+                <tr>
+                    <td class="w3-border-right"><%= curSub.subject_name %></td>
+                    <td class="w3-border-right"><%= curSub.batch %></td>
+                    <td class="w3-border-right"><%= curSub.course.toUpperCase() %></td>
+            <%
+                if(curSub.combined === 0)
+                {
+            %>
+                    <td class="w3-border-right"><%= curSub.streams.toUpperCase() %></td>
+            <%
+                }
+                else
+                {
+                    var streams = JSON.parse(curSub.streams)
+            %>
+                    <td class="w3-border-right">
+            <%
+                    for(var j = 0; j < streams.length - 1; j++)
+                    {
+            %>
+                        <%= streams[j].toUpperCase() %>,
+            <%
+                    }
+            %>
+                    <%= streams[j].toUpperCase() %>
+                    </td>
+            <%
+                }
+            %>
+            <%
+                var user_name = curSub.user_name
+                if(user_name)
+                {
+            %>
+                    <td><%= user_name %></td>
+            <%
+                }
+                else
+                {
+            %>
+                    <td>
+                        <button class="w3-btn w3-round w3-tiny w3-blue"
+                                id="{&quot;sid&quot;:&quot;<%= curSub.sid %>&quot;,&quot;name&quot;:&quot;<%= curSub.subject_name %>&quot;}">
+                            Assign
+                        </button>
+                    </td>
+            <%
+                }
+            %>
+                </tr>
+            <%
+            }
+            %>
             <script type="text/javascript">
                 var buttons = document.getElementsByTagName('button')
                 for(var i = 0; i < buttons.length; i++)

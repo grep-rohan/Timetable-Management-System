@@ -10,15 +10,41 @@
 <div class="w3-container w3-padding-64 w3-center" id="container">
     <!--incomplete subjects-->
     <div class="w3-margin-bottom w3-left-align" style="display: inline-block">
-        <% for(var i = 0; i < incomplete_subs.length; i++) {
-            var cur = incomplete_subs[i] %>
-        <form method="post" action="/get_subject"
-              class="w3-panel w3-leftbar w3-khaki w3-padding w3-margin-bottom">
-            Add <%= cur.lec_per_week - cur.cnt %> more lecture(s) of <%= cur.name %> of <%= cur.batch %>
-            - <%= cur.course %>
-            <% if(cur.course) { %>
-            - <%= cur.stream %>
-            <% } %>
+        <%
+        for(var i = 0; i < incomplete_subs.length; i++)
+        {
+            var cur = incomplete_subs[i]
+        %>
+            <form method="post" action="/get_subject" class="w3-panel w3-leftbar w3-khaki w3-padding w3-margin-bottom">
+                Add <%= cur.lec_per_week - cur.cnt %> more lecture(s) of <%= cur.name %> of <%= cur.batch %>
+                - <%= cur.course.toUpperCase() %>
+        <%
+            if(cur.course === 'btech')
+            {
+        %>
+                -
+        <%
+                if(cur.combined === 0)
+                {
+        %>
+                    <%= cur.streams.toUpperCase() %>
+        <%
+                }
+                else
+                {
+                    var streams = JSON.parse(cur.streams)
+                    for(j = 0; j < streams.length - 1; j++)
+                    {
+        %>
+                        <%= streams[j].toUpperCase() %>,
+        <%
+                    }
+        %>
+                    <%= streams[j].toUpperCase() %>
+        <%
+                }
+            }
+        %>
             &nbsp;
 
             <label>
@@ -26,7 +52,9 @@
             </label>
             <button class="w3-btn w3-blue w3-tiny w3-round" type="submit">Add</button>
         </form>
-        <% } %>
+        <%
+        }
+        %>
     </div>
 
     <!--time table-->
@@ -66,11 +94,11 @@
                 <td class="w3-blue w3-border"></td>
                 <% } else { %>
                 <td class="w3-red w3-center w3-tooltip">
-                        <span style="position:absolute; font-size: 14px" class="w3-text w3-tag w3-round">
-                        <%= timings[index].course %>
+                        <span style="position:absolute; font-size: 14px; z-index: 1" class="w3-text w3-tag w3-round">
+                        <%= timings[index].course.toUpperCase() %>
                             <br>
                             <% if(timings[index].course === 'btech') { %>
-                            <%= timings[index].stream %>
+                            <%= timings[index].streams.toUpperCase() %>
                             <% } %>
                             <br>
                             <%= timings[index].batch %>
@@ -84,15 +112,15 @@
                 <td class="w3-border w3-green"></td>
                 <% } else { %>
                 <td class="w3-yellow w3-center w3-tooltip w3-border">
-                        <span style="position:absolute; font-size: 14px" class="w3-text w3-tag w3-round">
-                        <%= timings[index].course %>
+                        <span style="position:absolute; font-size: 14px; z-index: 1" class="w3-text w3-tag w3-round">
+                        <%= timings[index].course.toUpperCase() %>
                             <br>
                             <% if(timings[index].course === 'btech') { %>
-                            <%= timings[index].stream %>
+                            <%= timings[index].streams.toUpperCase() %>
                             <% } %>
                             <br>
                             <%= timings[index].batch %>
-                    </span>
+                        </span>
                     <span style="font-size: 16px; "><b><%= timings[index].abbrev %></b></span>
                     <span style="font-size: 10px; "><%= timings[index].room_name %></span>
                 </td>

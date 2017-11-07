@@ -84,7 +84,7 @@ module.exports = function(app)
                         'FROM timings, subjects\n' +
                         'WHERE timings.sid = subjects.sid\n' +
                         'AND subjects.course = \'' + curSub.course + '\'\n' +
-                        'AND subjects.stream = \'' + curSub.stream + '\'\n' +
+                        'AND subjects.streams = \'' + curSub.stream + '\'\n' +
                         'AND subjects.batch = ' + curSub.batch + '\n' +
                         'ORDER BY timings.day, timings.time'
 
@@ -135,8 +135,6 @@ module.exports = function(app)
                 ' AND timings.time = ' + req.body.time + '\n' +
                 ' AND rooms.rid = timings.rid)'
 
-            console.log(sql)
-
             var callback = function(result)
             {
                 req.session['availableRooms'] = result
@@ -157,8 +155,6 @@ module.exports = function(app)
         {
             var data = req.body
 
-            console.log(data)
-
             var mysql = require('mysql')
             var dbconfig = require('../config/database')
             var connection = mysql.createConnection(dbconfig.connection)
@@ -171,10 +167,6 @@ module.exports = function(app)
             connection.query(sql, [values],
                 function(err, result)
                 {
-                    if(err)
-                        console.log(err.message)
-                    else
-                        console.log(result.message)
                     res.redirect('/')
                 }
             )

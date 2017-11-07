@@ -12,37 +12,30 @@
 <!--js scripts-->
 <script type="text/javascript">
     // change visibility of streams based on selected course
-    function updateStream()
-    {
+    function updateStream() {
         var course = document.getElementById('course')
-        if(course.options[course.selectedIndex].value === 'btech')
-        {
+        if (course.options[course.selectedIndex].value === 'btech') {
             document.getElementById('stream').style.display = 'block'
             document.getElementById('none').checked = false
         }
-        else
-        {
+        else {
             document.getElementById('stream').style.display = 'none'
             document.getElementById('none').checked = true
         }
     }
 
     // allow only number input
-    function isNumber(evt)
-    {
+    function isNumber(evt) {
         evt = (evt) ? evt : window.event
         var charCode = (evt.which) ? evt.which : evt.keyCode
         return !(charCode > 31 && (charCode < 48 || charCode > 57))
 
     }
 
-    jQuery(function($)
-    {
-        $('#form').submit(function(e)
-        {
+    jQuery(function ($) {
+        $('#form').submit(function (e) {
             //check atleat 1 checkbox is checked
-            if(!$('.w3-check').is(':checked'))
-            {
+            if (!$('.w3-check').is(':checked')) {
                 alert('Choose atleast 1 stream! ')
                 e.preventDefault()
             }
@@ -86,6 +79,14 @@
         </label>
 
         <div id="stream" style="display: none">
+            <label>
+                <input class="w3-check" type="checkbox" name="combined">
+            </label>
+            <label>Combined Streams?</label>
+
+            <br>
+            <br>
+
             <label>Stream<span class="w3-text-red">*</span></label>
 
             <label>

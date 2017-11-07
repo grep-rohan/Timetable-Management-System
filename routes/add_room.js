@@ -97,15 +97,9 @@ module.exports = function(app)
                 function(err, result)
                 {
                     if(err)
-                    {
-                        console.log(err.message)
                         callback(false)
-                    }
                     else
-                    {
-                        console.log(result.message)
                         callback(true)
-                    }
                 }
             )
         }

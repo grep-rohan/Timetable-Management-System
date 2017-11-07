@@ -43,7 +43,7 @@ module.exports = function(app)
                 var sql = 'SELECT * \n' +
                     'FROM (SELECT *\n' +
                     '      FROM (SELECT *, COUNT(sid) AS cnt\n' +
-                    '            FROM (SELECT subjects.sid, subjects.name, subjects.abbrev, subjects.course, subjects.stream, subjects.lec_per_week, subjects.batch\n' +
+                    '            FROM (SELECT subjects.sid, subjects.name, subjects.abbrev, subjects.course, subjects.combined,subjects.streams, subjects.lec_per_week, subjects.batch\n' +
                     '                  FROM timings, subjects, assignments\n' +
                     '                  WHERE assignments.uid = ' + req.user.uid + '\n' +
                     '                  AND timings.sid=assignments.sid\n' +
@@ -58,12 +58,9 @@ module.exports = function(app)
                     '      AND assignments.uid = ' + req.user.uid + ') AS t\n' +
                     'ORDER BY cnt, name'
 
-                console.log(sql)
-
                 connection.query(sql,
                     function(err, result2)
                     {
-                        console.log(err, result2)
                         callback2(result, result2)
                     }
                 )
@@ -76,7 +73,7 @@ module.exports = function(app)
             connection.query('USE ' + dbconfig.database)
 
             var sql = 'SELECT timings.day, timings.time, rooms.name AS room_name, subjects.name AS subject_name, ' +
-                'subjects.abbrev, subjects.course, subjects.stream, subjects.batch\n' +
+                'subjects.abbrev, subjects.course, subjects.combined, subjects.streams, subjects.batch\n' +
                 'FROM timings, rooms, subjects, assignments\n' +
                 'WHERE assignments.uid=' + req.user.uid + '\n' +
                 'AND timings.sid=assignments.sid\n' +
@@ -84,12 +81,9 @@ module.exports = function(app)
                 'AND timings.rid=rooms.rid\n' +
                 'ORDER BY subject_name'
 
-            console.log(sql)
-
             connection.query(sql,
                 function(err, result)
                 {
-                    console.log(err, result)
                     callback1(result, connection)
                 }
             )
@@ -111,13 +105,15 @@ module.exports = function(app)
                     'FROM subjects, rooms, students, timings, users, assignments\n' +
                     'WHERE students.uid = ' + req.user.uid + '\n' +
                     'AND subjects.course = students.course\n' +
-                    'AND subjects.stream = students.stream\n' +
+                    'AND subjects.streams LIKE CONCAT(\'%\', students.stream, \'%\')\n' +
                     'AND subjects.batch = students.batch\n' +
                     'AND subjects.sid = timings.sid\n' +
                     'AND timings.rid = rooms.rid\n' +
                     'AND assignments.sid = subjects.sid\n' +
                     'AND users.uid = assignments.uid\n' +
                     'ORDER BY day, time'
+
+                console.log(sql)
 
                 connection.query(sql,
                     function(err, result)

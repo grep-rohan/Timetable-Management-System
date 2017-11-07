@@ -9,10 +9,11 @@ connection.query('\
     `name` VARCHAR(255) NOT NULL, \
     `abbrev` VARCHAR(10) NOT NULL, \
     `course` ENUM(\'btech\', \'mba\', \'bba\', \'bcomm\') NOT NULL, \
-    `stream` ENUM(\'none\', \'csc\', \'cse\', \'me\', \'ece\', \'ce\') NOT NULL, \
+    `combined` TINYINT(1) NOT NULL, \
+    `streams` VARCHAR(99) NOT NULL, \
     `lec_per_week` TINYINT UNSIGNED NOT NULL, \
     `batch` YEAR(4) NOT NULL, \
-    UNIQUE(`name`, `course`, `stream`, `batch`) \
+    UNIQUE(`name`, `course`, `streams`, `batch`) \
     )')
 
 console.log('Success: subjects Table Created!')

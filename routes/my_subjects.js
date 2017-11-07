@@ -21,7 +21,6 @@ module.exports = function(app)
 
                 var callback2 = function(result)
                 {
-                    console.log(result)
                     res.render('my_subjects.ejs',
                         {
                             title: 'My Subjects',
@@ -43,17 +42,21 @@ module.exports = function(app)
                             sql += ' OR sid=' + result[i].sid
                     }
 
-                    connection.query(sql,
-                        function(err, result)
-                        {
-                            callback2(result)
-                        }
+                    if(result.length === 0)
+                        callback2([])
+                    else
+                        connection.query(sql,
+                            function(err, result)
+                            {
+                                callback2(result)
+                            }
                     )
                 }
 
                 connection.query(sql,
                     function(err, result)
                     {
+                        console.log(result)
                         callback1(result)
                     }
                 )

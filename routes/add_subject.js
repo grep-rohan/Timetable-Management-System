@@ -63,7 +63,6 @@ module.exports = function(app)
             var lecPerWeek = data.lec_per_week
             if(parseInt(lecPerWeek) < 1 || parseInt(lecPerWeek) > 5)
             {
-                console.log('lectures per week error')
                 req.flash('addSubjectMessage',
                     JSON.stringify(
                         {
@@ -101,13 +100,27 @@ module.exports = function(app)
 
             connection.query('USE ' + dbconfig.database)
 
-            var sql = 'INSERT INTO subjects (name, abbrev, course, stream, lec_per_week, batch) VALUES ?'
+            var sql = 'INSERT INTO subjects (name, abbrev, course, combined, streams, lec_per_week, batch) VALUES ?'
             var values = []
             var streams = ['none', 'csc', 'cse', 'me', 'ece', 'ce']
-            for(var i = 0; i < streams.length; i++)
-                if(streams[i] in data)
-                    values.push([data.name, data.abbrev, data.course, streams[i], data.lec_per_week,
-                        data.batch])
+
+            if('combined' in data)
+            {
+                console.log('b')
+                var _streams = []
+                for(i = 0; i < streams.length; i++)
+                    if(streams[i] in data)
+                        _streams.push(streams[i])
+                values.push([data.name, data.abbrev, data.course, 1, JSON.stringify(_streams), data.lec_per_week,
+                    data.batch])
+            }
+            else
+            {
+                console.log('a')
+                for (var i = 0; i < streams.length; i++)
+                    if (streams[i] in data)
+                        values.push([data.name, data.abbrev, data.course, 0, streams[i], data.lec_per_week, data.batch])
+            }
 
             var callback = function(result)
             {
@@ -125,7 +138,7 @@ module.exports = function(app)
                         JSON.stringify(
                             {
                                 status: 'error',
-                                message: 'Subject already exists!'
+                                message: 'Error inserting subject!'
                             }
                         )
                     )
@@ -144,7 +157,7 @@ module.exports = function(app)
                 }
                 else
                 {
-                    console.log(result.message)
+                    console.log(result)
                     callback(true)
                 }
             })
