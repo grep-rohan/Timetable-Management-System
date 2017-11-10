@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<!--head-->
+<% include ./partials/head.ejs %>
+<body>
+<!--js scripts-->
+<script type="text/javascript">
+    // allow only number input
+    function isNumber(evt)
+    {
+        evt = (evt) ? evt : window.event
+        var charCode = (evt.which) ? evt.which : evt.keyCode
+        return !(charCode > 31 && (charCode < 48 || charCode > 57))
+
+    }
+</script>
+
+<!--navbar-->
+<% include ./partials/navbar.ejs %>
+
+<!--main container-->
+<div class="w3-container w3-padding-64 w3-third w3-display-topmiddle" id="container">
+    <!--flash message-->
+    <% include ./partials/flash_message.ejs %>
+
+    <!--form-->
+    <form action="/add_stream" method="post"
+          class="w3-container w3-padding w3-light-grey w3-round w3-border w3-card-4" id="form">
+        <h2>Add Stream</h2>
+
+        <label>Name<span class="w3-text-red">*</span></label>
+        <label>
+            <input type="text" class="w3-input w3-border w3-round" name="name" required maxlength="10" minlength="2">
+        </label>
+
+        <label>Batch<span class="w3-text-red">*</span></label>
+        <label>
+            <input type="number" class="w3-input w3-border w3-round" name="batch" required
+                   onkeypress="return isNumber(event)" min="" max="" id="batch">
+        </label>
+
+        <label>Course<span class="w3-text-red">*</span></label>
+        <label>
+            <select class="w3-select w3-border w3-round" required name="cid">
+                <option value=""></option>
+                <%
+                for(var i = 0; i < courses.length; i++)
+                {
+                %>
+                    <option value=<%= courses[i].cid %>><%= courses[i].name %></option>
+                <%
+                }
+                %>
+            </select>
+        </label>
+
+        <br><br>
+
+        <button type="submit" class="w3-btn w3-round w3-blue">Add Stream</button>
+    </form>
+</div>
+</body>
+</html>
