@@ -30,7 +30,7 @@ module.exports = function(app)
 
                 connection.query('USE ' + dbconfig.database)
 
-                sql = 'SELECT cid, name FROM courses WHERE streams = 1'
+                sql = 'SELECT cid, name FROM courses ORDER BY name'
 
                 connection.query(sql,
                     function(err, result)
@@ -59,8 +59,9 @@ module.exports = function(app)
 
             connection.query('USE ' + dbconfig.database)
 
-            var sql = 'INSERT INTO streams (name, batch, cid) VALUES ?'
-            var values = [[data.name, data.batch, data.cid]]
+
+            sql = 'INSERT INTO streams (name, batch, cid) VALUES ?'
+            values = [[data.name, data.batch, data.cid]]
 
             var callback = function(result)
             {

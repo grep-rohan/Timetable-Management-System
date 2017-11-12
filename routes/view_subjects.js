@@ -17,14 +17,12 @@ module.exports = function(app)
 
                 connection.query('USE ' + dbconfig.database)
 
-                var sql = 'SELECT subjects.sid, subjects.name AS subject_name, subjects.batch, subjects.course, ' +
-                    'subjects.combined, subjects.streams, users.name AS user_name\n' +
+                var sql = 'SELECT subjects.sid, subjects.name as subject_name, users.name as user_name\n' +
                     'FROM subjects\n' +
                     'LEFT JOIN assignments\n' +
                     '   INNER JOIN users\n' +
-                    '   ON assignments.uid = users.uid\n' +
-                    'ON subjects.sid = assignments.sid\n' +
-                    'ORDER BY subject_name'
+                    '   ON  assignments.uid = users.uid\n' +
+                    'ON subjects.sid = assignments.sid'
 
                 var callback2 = function(faculty, subjects)
                 {
@@ -53,7 +51,6 @@ module.exports = function(app)
                 connection.query(sql,
                     function(err, result)
                     {
-                        console.log(result)
                         callback1(result)
                     }
                 )

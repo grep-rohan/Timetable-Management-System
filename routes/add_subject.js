@@ -7,13 +7,34 @@ module.exports = function(app)
                 res.redirect('/')
 
             if(req.user.type === 'po')
-                res.render('add_subject.ejs',
+            {
+                var callback = function(courses)
+                {
+                    res.render('add_subject.ejs',
+                        {
+                            title: 'Add Subject',
+                            user: req.user,
+                            message: req.flash('addSubjectMessage'),
+                            courses: courses
+                        }
+                    )
+                }
+
+                var mysql = require('mysql')
+                var dbconfig = require('../config/database')
+                var connection = mysql.createConnection(dbconfig.connection)
+
+                connection.query('USE ' + dbconfig.database)
+
+                sql = 'SELECT cid, name FROM courses ORDER BY name'
+
+                connection.query(sql,
+                    function(err, result)
                     {
-                        title: 'Add Subject',
-                        user: req.user,
-                        message: req.flash('addSubjectMessage')
+                        callback(result)
                     }
                 )
+            }
             else
             {
                 var error = new Error('Access Denied!')
@@ -27,6 +48,8 @@ module.exports = function(app)
         function(req, res)
         {
             var data = req.body
+
+            console.log(data)
 
             // subject name validation
             var name = data.name
@@ -75,52 +98,14 @@ module.exports = function(app)
                 return
             }
 
-            // batch validation
-            var batch = data.batch
-            var dt = new Date()
-            var max = dt.getYear() + 1900
-            var min = max - 4
-            if(parseInt(batch) < min || parseInt(batch) > max)
-            {
-                req.flash('addSubjectMessage',
-                    JSON.stringify(
-                        {
-                            status: 'error',
-                            message: 'Batch should be between ' + min + ' and ' + max
-                        }
-                    )
-                )
-                res.redirect('/add_subject')
-                return
-            }
-
             var mysql = require('mysql')
             var dbconfig = require('../config/database')
             var connection = mysql.createConnection(dbconfig.connection)
 
             connection.query('USE ' + dbconfig.database)
 
-            var sql = 'INSERT INTO subjects (name, abbrev, course, combined, streams, lec_per_week, batch) VALUES ?'
-            var values = []
-            var streams = ['none', 'csc', 'cse', 'me', 'ece', 'ce']
-
-            if('combined' in data)
-            {
-                console.log('b')
-                var _streams = []
-                for(i = 0; i < streams.length; i++)
-                    if(streams[i] in data)
-                        _streams.push(streams[i])
-                values.push([data.name, data.abbrev, data.course, 1, JSON.stringify(_streams), data.lec_per_week,
-                    data.batch])
-            }
-            else
-            {
-                console.log('a')
-                for (var i = 0; i < streams.length; i++)
-                    if (streams[i] in data)
-                        values.push([data.name, data.abbrev, data.course, 0, streams[i], data.lec_per_week, data.batch])
-            }
+            var sql = 'INSERT INTO subjects (name, abbrev, lec_per_week) VALUES ?'
+            var values = [[data.name, data.abbrev, data.lec_per_week]]
 
             var callback = function(result)
             {
@@ -148,19 +133,69 @@ module.exports = function(app)
                 res.redirect('/add_subject')
             }
 
-            connection.query(sql, [values], function(err, result)
-            {
-                if(err)
+            connection.query(sql, [values],
+                function (err, result)
                 {
-                    console.log(err.message)
-                    callback(false)
+                    if (err)
+                        callback(false)
+                    else
+                    {
+                        var sql = 'INSERT INTO subject_streams (sid, streamid) VALUES ?'
+                        var values = [[result.insertId, data.streamid]]
+
+                        connection.query(sql, [values],
+                            function (err)
+                            {
+                                if(err)
+                                    callback(false)
+                                else
+                                    callback(true)
+                            }
+                        )
+                    }
                 }
-                else
+            )
+        }
+    )
+
+    app.get('/get_batches',
+        function (req, res)
+        {
+            var mysql = require('mysql')
+            var dbconfig = require('../config/database')
+            var connection = mysql.createConnection(dbconfig.connection)
+
+            connection.query('USE ' + dbconfig.database)
+
+            var sql = 'SELECT DISTINCT batch FROM streams WHERE cid = ' + req.query.cid + ' ORDER BY batch'
+
+            connection.query(sql,
+                function (err, result)
                 {
-                    console.log(result)
-                    callback(true)
+                    res.send(result)
                 }
-            })
+            )
+        }
+    )
+
+    app.get('/get_streams',
+        function (req, res)
+        {
+            var mysql = require('mysql')
+            var dbconfig = require('../config/database')
+            var connection = mysql.createConnection(dbconfig.connection)
+
+            connection.query('USE ' + dbconfig.database)
+
+            var sql = 'SELECT streamid, name FROM streams WHERE cid = ' + req.query.cid + ' AND batch = '
+                + req.query.batch + ' ORDER BY name'
+
+            connection.query(sql,
+                function (err, result)
+                {
+                    res.send(result)
+                }
+            )
         }
     )
 }

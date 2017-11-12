@@ -37,10 +37,8 @@ module.exports = function(app)
 
             connection.query('USE ' + dbconfig.database)
 
-            var sql = 'INSERT INTO courses (name, streams) VALUES ?'
-            var values = [[data.name, typeof data.streams !== 'undefined' ? 1 : 0]]
-
-            console.log(values)
+            var sql = 'INSERT INTO courses (name) VALUES ?'
+            var values = [[data.name]]
 
             var callback = function(result)
             {
