@@ -17,12 +17,33 @@ module.exports = function(app)
 
                 connection.query('USE ' + dbconfig.database)
 
-                var sql = 'SELECT subjects.sid, subjects.name as subject_name, users.name as user_name\n' +
-                    'FROM subjects\n' +
-                    'LEFT JOIN assignments\n' +
-                    '   INNER JOIN users\n' +
-                    '   ON  assignments.uid = users.uid\n' +
-                    'ON subjects.sid = assignments.sid'
+                var sql = 'SELECT A.sid, subject_name, user_name, course, batch, streams FROM \n' +
+                    '(\n' +
+                    '    SELECT subjects.sid, subjects.name as subject_name, users.name as user_name\n' +
+                    '\tFROM subjects\n' +
+                    '\tLEFT JOIN assignments\n' +
+                    '   \t\tINNER JOIN users\n' +
+                    '   \t\tON  assignments.uid = users.uid\n' +
+                    '\tON subjects.sid = assignments.sid\n' +
+                    ') as A,\n' +
+                    '(\n' +
+                    '    SELECT DISTINCT subjects.sid, courses.name as course, streams.batch\n' +
+                    '    FROM subjects, subject_streams, courses, streams\n' +
+                    '    WHERE subjects.sid = subject_streams.sid\n' +
+                    '    AND streams.streamid = subject_streams.streamid\n' +
+                    '    AND courses.cid = streams.cid\n' +
+                    ') as B,\n' +
+                    '(\n' +
+                    '    SELECT subjects.sid, GROUP_CONCAT(streams.name SEPARATOR \', \') as streams\n' +
+                    '    FROM subjects, streams, subject_streams\n' +
+                    '    WHERE subjects.sid = subject_streams.sid\n' +
+                    '    AND streams.streamid = subject_streams.streamid\n' +
+                    '    GROUP BY sid\n' +
+                    ') as C\n' +
+                    'WHERE A.sid = B.sid\n' +
+                    'AND A.sid = C.sid'
+
+                console.log(sql)
 
                 var callback2 = function(faculty, subjects)
                 {
