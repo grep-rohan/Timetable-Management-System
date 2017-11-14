@@ -49,8 +49,6 @@ module.exports = function(app)
         {
             var data = req.body
 
-            console.log(data)
-
             // subject name validation
             var name = data.name
             if(name.length < 5 || name.length > 255)

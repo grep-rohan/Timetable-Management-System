@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html>
 <!--head-->
-<% include ./partials/head.ejs %>
+<head>
+    <title>BMU : <%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">-->
+    <link rel="stylesheet" href="/public/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
 <body>
 <!--js scripts-->
 <script type="text/javascript">
@@ -21,21 +28,6 @@
                 else
                     tr[i].style.display = 'none'
         }
-    }
-
-    function getCourse(sid, tdid)
-    {
-        console.log(sid, tdid)
-        var xhttp = new XMLHttpRequest()
-        xhttp.onreadystatechange = function()
-        {
-            if (this.readyState === 4 && this.status === 200)
-            {
-                console.log(this.responseText)
-            }
-        }
-        xhttp.open("GET", "/get_course?sid=" + sid.toString(), true)
-        xhttp.send()
     }
 </script>
 
@@ -67,7 +59,23 @@
                     <td class="w3-border-right"><%= curSub.subject_name %></td>
                     <td class="w3-border-right"><%= curSub.batch %></td>
                     <td class="w3-border-right"><%= curSub.course %></td>
-                    <td class="w3-border-right"><%= curSub.streams %></td>
+                    <td class="w3-border-right">
+                        <%= curSub.streams %>
+                        <button class="w3-btn w3-round w3-tiny w3-green w3-right"
+                                id="<%= JSON.stringify(
+                                        {
+                                            id: 1,
+                                            sid: curSub.sid,
+                                            name: curSub.subject_name,
+                                            batch: curSub.batch,
+                                            course: curSub.course,
+                                            streams: curSub.streams,
+                                            cid: curSub.cid
+                                        }
+                                ) %>">
+                            Add
+                        </button>
+                    </td>
             <%
                 var user_name = curSub.user_name
                 if(user_name)
@@ -81,7 +89,13 @@
             %>
                     <td>
                         <button class="w3-btn w3-round w3-tiny w3-blue"
-                                id="{&quot;sid&quot;:&quot;<%= curSub.sid %>&quot;,&quot;name&quot;:&quot;<%= curSub.subject_name %>&quot;}">
+                                id="<%= JSON.stringify(
+                                        {
+                                            id: 2,
+                                            sid: curSub.sid,
+                                            name: curSub.subject_name
+                                        }
+                                ) %>">
                             Assign
                         </button>
                     </td>
@@ -93,22 +107,118 @@
             }
             %>
             <script type="text/javascript">
+                function getStreams(sid, cid, batch)
+                {
+                    $('#stream').find('option').remove()
+
+                    var xhttp = new XMLHttpRequest()
+                    xhttp.onreadystatechange = function()
+                    {
+                        if (this.readyState === 4 && this.status === 200)
+                        {
+                            streams = JSON.parse(this.response)
+
+                            $('#stream').append('<option value=""></option>');
+                            for(var i = 0; i < streams.length; i++)
+                                $('#stream').append('<option value="' + streams[i].streamid + '">' + streams[i].name +
+                                    '</option>');
+                        }
+                    }
+                    xhttp.open("GET", "/get_unassigned_streams?sid=" + sid.toString() + "&cid=" + cid.toString() +
+                        "&batch=" + batch.toString(), true)
+                    xhttp.send()
+                }
+
                 var buttons = document.getElementsByTagName('button')
                 for(var i = 0; i < buttons.length; i++)
                     buttons[i].onclick = function(e)
                     {
-                        var assign = document.getElementById('assign_modal')
-                        assign.style.display = 'block'
-
                         var obj = JSON.parse(this.id)
 
-                        var name = document.getElementById('name')
-                        name.value = obj.name
-                        var id = document.getElementById('id')
-                        id.value = obj.sid
+                        if(obj.id === 1)    // add stream
+                        {
+                            getStreams(obj.sid, obj.cid, obj.batch)
+
+                            var sid = document.getElementById('sid1')
+                            sid.value = obj.sid
+                            var name = document.getElementById('name1')
+                            name.value = obj.name
+                            var batch = document.getElementById('batch')
+                            batch.value = obj.batch
+                            var course = document.getElementById('course')
+                            course.value = obj.course
+                            var streams = document.getElementById('streams')
+                            streams.value = obj.streams
+
+                            var add_stream = document.getElementById('add_stream_modal')
+                            add_stream.style.display = 'block'
+                        }
+                        else    // assign
+                        {
+                            sid = document.getElementById('sid2')
+                            sid.value = obj.sid
+                            name = document.getElementById('name2')
+                            name.value = obj.name
+
+                            var assign = document.getElementById('assign_modal')
+                            assign.style.display = 'block'
+                        }
                     }
             </script>
         </table>
+    </div>
+</div>
+
+<!--add stream form modal-->
+<div id="add_stream_modal" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-top">
+        <form action="/add_stream_to_subject" method="post"
+              class="w3-padding w3-border w3-card-4" id="form">
+            <div class="w3-center">
+                <span onclick="document.getElementById('add_stream_modal').style.display='none'"
+                      class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+            </div>
+            <h3>Add Stream</h3>
+
+            <label>
+                <input type="text" name="sid" id="sid1" required style="display: none">
+            </label>
+
+            <label>Subject<span class="w3-text-red">*</span></label>
+            <label>
+                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="name" id="name1" required
+                       disabled>
+            </label>
+
+            <label>Batch<span class="w3-text-red">*</span></label>
+            <label>
+                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="batch" id="batch" required
+                       disabled>
+            </label>
+
+            <label>Course<span class="w3-text-red">*</span></label>
+            <label>
+                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="course" id="course" required
+                       disabled>
+            </label>
+
+            <label>Existing Stream(s)<span class="w3-text-red">*</span></label>
+            <label>
+                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="streams" id="streams" required
+                       disabled>
+            </label>
+
+            <label>New Stream<span class="w3-text-red">*</span></label>
+            <label>
+                <select class="w3-select w3-border w3-round" required name="stream" id="stream">
+                    <option value=""></option>
+                </select>
+            </label>
+
+            <br><br>
+
+            <button type="submit" class="w3-btn w3-round w3-blue">Add</button>
+        </form>
     </div>
 </div>
 
@@ -124,50 +234,12 @@
             <h3>Assign Faculty</h3>
 
             <label>
-                <input type="text" name="id" id="id" required style="display: none">
+                <input type="text" name="sid" id="sid2" required style="display: none">
             </label>
 
             <label>Subject<span class="w3-text-red">*</span></label>
             <label>
-                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="name" id="name" required
-                       disabled>
-            </label>
-
-            <label>Faculty<span class="w3-text-red">*</span></label>
-            <label>
-                <select class="w3-select w3-border w3-round" required name="faculty">
-                    <option value=""></option>
-                    <% for(var i = 0; i < faculty.length; i++) { %>
-                    <option value=<%= faculty[i].uid %>><%= faculty[i].name %></option>
-                    <% } %>
-                </select>
-            </label>
-
-            <br><br>
-
-            <button type="submit" class="w3-btn w3-round w3-blue">Assign</button>
-        </form>
-    </div>
-</div>
-
-<!--add stream form modal-->
-<div id="add_stream_modal" class="w3-modal">
-    <div class="w3-modal-content w3-card-4 w3-animate-top">
-        <form action="/add_stream_subject" method="post"
-              class="w3-padding w3-border w3-card-4" id="form">
-            <div class="w3-center">
-                <span onclick="document.getElementById('add_stream_modal').style.display='none'"
-                      class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
-            </div>
-            <h3>Add Stream</h3>
-
-            <label>
-                <input type="text" name="id" id="id" required style="display: none">
-            </label>
-
-            <label>Subject<span class="w3-text-red">*</span></label>
-            <label>
-                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="name" id="name" required
+                <input type="text" class="w3-input w3-border w3-round w3-disabled" name="name" id="name2" required
                        disabled>
             </label>
 
