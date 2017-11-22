@@ -44,6 +44,8 @@ module.exports = function(app)
                     'AND A.sid = C.sid\n' +
                     'ORDER BY batch, course, streams, subject_name, user_name'
 
+                console.log(sql)
+
                 var callback2 = function(faculty, subjects)
                 {
                     res.render('view_subjects.ejs',

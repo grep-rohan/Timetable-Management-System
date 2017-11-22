@@ -38,15 +38,15 @@ module.exports = function(app)
                 )
             }
 
-            var callback1 = function(result, connection)
+            var callback1 = function(timings)
             {
                 var sql = 'SELECT * \n' +
                     'FROM (SELECT *\n' +
                     '      FROM (SELECT *, COUNT(sid) AS cnt\n' +
-                    '            FROM (SELECT subjects.sid, subjects.name, subjects.abbrev, subjects.course, subjects.combined,subjects.streams, subjects.lec_per_week, subjects.batch\n' +
+                    '            FROM (SELECT subjects.sid, subjects.name, subjects.abbrev, subjects.lec_per_week\n' +
                     '                  FROM timings, subjects, assignments\n' +
-                    '                  WHERE assignments.uid = ' + req.user.uid + '\n' +
-                    '                  AND timings.sid=assignments.sid\n' +
+                    '                  WHERE assignments.uid = 3\n' +
+                    '                  AND timings.sid = assignments.sid\n' +
                     '                  AND assignments.sid=subjects.sid) AS x\n' +
                     '            GROUP BY sid) AS y\n' +
                     '      WHERE cnt < lec_per_week\n' +
@@ -55,13 +55,13 @@ module.exports = function(app)
                     '      FROM subjects, assignments\n' +
                     '      WHERE subjects.sid NOT IN (SELECT DISTINCT sid FROM timings)\n' +
                     '      AND assignments.sid = subjects.sid\n' +
-                    '      AND assignments.uid = ' + req.user.uid + ') AS t\n' +
+                    '      AND assignments.uid = 3) AS t\n' +
                     'ORDER BY cnt, name'
 
                 connection.query(sql,
-                    function(err, result2)
+                    function(err, result)
                     {
-                        callback2(result, result2)
+                        callback2(timings, result)
                     }
                 )
             }
@@ -72,19 +72,37 @@ module.exports = function(app)
 
             connection.query('USE ' + dbconfig.database)
 
-            var sql = 'SELECT timings.day, timings.time, rooms.name AS room_name, subjects.name AS subject_name, ' +
-                'subjects.abbrev, subjects.course, subjects.combined, subjects.streams, subjects.batch\n' +
-                'FROM timings, rooms, subjects, assignments\n' +
-                'WHERE assignments.uid=' + req.user.uid + '\n' +
-                'AND timings.sid=assignments.sid\n' +
-                'AND assignments.sid=subjects.sid\n' +
-                'AND timings.rid=rooms.rid\n' +
-                'ORDER BY subject_name'
+            var sql = 'SELECT day, time, room_name, subject_name, abbrev, course, streams, batch\n' +
+                'FROM\n' +
+                '(\n' +
+                '    SELECT subjects.sid, timings.day, timings.time, rooms.name AS room_name, subjects.name AS subject_name, subjects.abbrev\n' +
+                '\tFROM timings, rooms, subjects, assignments\n' +
+                '\tWHERE assignments.uid = 3\n' +
+                '\tAND\ttimings.sid = assignments.sid\n' +
+                '\tAND assignments.sid = subjects.sid\n' +
+                '\tAND timings.rid = rooms.rid\n' +
+                ') as A,\n' +
+                '(\n' +
+                '\tSELECT DISTINCT subjects.sid, courses.name as course, streams.batch\n' +
+                '    FROM subjects, subject_streams, courses, streams\n' +
+                '    WHERE subjects.sid = subject_streams.sid\n' +
+                '    AND streams.streamid = subject_streams.streamid\n' +
+                '    AND courses.cid = streams.cid    \n' +
+                ') as B,\n' +
+                '(\n' +
+                '    SELECT subjects.sid, GROUP_CONCAT(streams.name SEPARATOR \', \') as streams\n' +
+                '    FROM subjects, streams, subject_streams\n' +
+                '    WHERE subjects.sid = subject_streams.sid\n' +
+                '    AND streams.streamid = subject_streams.streamid\n' +
+                '    GROUP BY sid\n' +
+                ') as C\n' +
+                'WHERE A.sid = B.sid\n' +
+                'AND A.sid = C.sid'
 
             connection.query(sql,
                 function(err, result)
                 {
-                    callback1(result, connection)
+                    callback1(result)
                 }
             )
         }
@@ -183,6 +201,42 @@ module.exports = function(app)
                 function()
                 {
                     res.redirect('/')
+                }
+            )
+        }
+    )
+
+    app.get('/get_subject_details',     // get streams not assigned to passed subject
+        function (req, res)
+        {
+            var mysql = require('mysql')
+            var dbconfig = require('../config/database')
+            var connection = mysql.createConnection(dbconfig.connection)
+
+            connection.query('USE ' + dbconfig.database)
+
+            var sql = 'SELECT course, batch, streams FROM \n' +
+                '(\n' +
+                '    SELECT DISTINCT subjects.sid, courses.name as course, courses.cid, streams.batch\n' +
+                '    FROM subjects, subject_streams, courses, streams\n' +
+                '    WHERE subjects.sid = subject_streams.sid\n' +
+                '    AND streams.streamid = subject_streams.streamid\n' +
+                '    AND courses.cid = streams.cid\n' +
+                ') as A,\n' +
+                '(\n' +
+                '    SELECT subjects.sid, GROUP_CONCAT(streams.name SEPARATOR \', \') as streams\n' +
+                '    FROM subjects, streams, subject_streams\n' +
+                '    WHERE subjects.sid = subject_streams.sid\n' +
+                '    AND streams.streamid = subject_streams.streamid\n' +
+                '    GROUP BY sid\n' +
+                ') as B\n' +
+                'WHERE A.sid = B.sid\n' +
+                'AND A.sid = ' + req.query.sid
+
+            connection.query(sql,
+                function(err, result)
+                {
+                    res.send(result)
                 }
             )
         }
