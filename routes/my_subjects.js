@@ -17,9 +17,35 @@ module.exports = function(app)
 
                 connection.query('USE ' + dbconfig.database)
 
-                var sql = 'SELECT sid FROM assignments WHERE uid=' + req.user.uid
+                var sql = 'SELECT subject_name, course, batch, streams FROM \n' +
+                    '(\n' +
+                    '    SELECT subjects.sid, subjects.name as subject_name\n' +
+                    '\tFROM subjects\n' +
+                    '\tLEFT JOIN assignments\n' +
+                    '\tON subjects.sid = assignments.sid\n' +
+                    '    WHERE assignments.uid = 3\n' +
+                    ') as A,\n' +
+                    '(\n' +
+                    '    SELECT DISTINCT subjects.sid, courses.name as course, streams.batch\n' +
+                    '    FROM subjects, subject_streams, courses, streams\n' +
+                    '    WHERE subjects.sid = subject_streams.sid\n' +
+                    '    AND streams.streamid = subject_streams.streamid\n' +
+                    '    AND courses.cid = streams.cid\n' +
+                    ') as B,\n' +
+                    '(\n' +
+                    '    SELECT subjects.sid, GROUP_CONCAT(streams.name SEPARATOR \', \') as streams\n' +
+                    '    FROM subjects, streams, subject_streams\n' +
+                    '    WHERE subjects.sid = subject_streams.sid\n' +
+                    '    AND streams.streamid = subject_streams.streamid\n' +
+                    '    GROUP BY sid\n' +
+                    ') as C\n' +
+                    'WHERE A.sid = B.sid\n' +
+                    'AND A.sid = C.sid\n' +
+                    'ORDER BY batch, course, streams, subject_name'
 
-                var callback2 = function(result)
+                console.log(sql)
+
+                var callback = function(result)
                 {
                     res.render('my_subjects.ejs',
                         {
@@ -31,33 +57,10 @@ module.exports = function(app)
                     connection.end()
                 }
 
-                var callback1 = function(result)
-                {
-                    sql = 'SELECT * FROM subjects WHERE sid='
-                    for(var i = 0; i < result.length; i++)
-                    {
-                        if(i === 0)
-                            sql += result[i].sid
-                        else
-                            sql += ' OR sid=' + result[i].sid
-                    }
-
-                    if(result.length === 0)
-                        callback2([])
-                    else
-                        connection.query(sql,
-                            function(err, result)
-                            {
-                                callback2(result)
-                            }
-                    )
-                }
-
                 connection.query(sql,
                     function(err, result)
                     {
-                        console.log(result)
-                        callback1(result)
+                        callback(result)
                     }
                 )
             }

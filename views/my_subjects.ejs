@@ -21,35 +21,10 @@
             {
                 var curSub = subjects[i] %>
                 <tr>
-                    <td class="w3-border-right"><%= curSub.name %></td>
+                    <td class="w3-border-right"><%= curSub.subject_name %></td>
                     <td class="w3-border-right"><%= curSub.batch %></td>
-                    <td class="w3-border-right"><%= curSub.course.toUpperCase() %></td>
-            <%
-                if(curSub.combined === 0)
-                {
-            %>
-                    <td><%= curSub.streams.toUpperCase() %></td>
-            <%
-                }
-                else
-                {
-                    var streams = JSON.parse(curSub.streams)
-                    console.log(streams)
-            %>
-                    <td>
-            <%
-                    for(var j = 0; j < streams.length - 1; j++)
-                    {
-            %>
-                        <%= streams[j].toUpperCase() %>,
-            <%
-                    }
-            %>
-                    <%= streams[j].toUpperCase() %>
-                    </td>
-            <%
-                }
-            %>
+                    <td class="w3-border-right"><%= curSub.course %></td>
+                    <td><%= curSub.streams %></td>
             </tr>
             <%
             }

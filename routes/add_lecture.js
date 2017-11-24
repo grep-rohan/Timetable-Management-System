@@ -67,8 +67,7 @@ module.exports = function(app)
                         'FROM timings, subjects, assignments\n' +
                         'WHERE assignments.sid = subjects.sid\n' +
                         'AND subjects.sid = timings.sid\n' +
-                        'AND assignments.uid = ' + req.user.uid + '\n' +
-                        'ORDER BY timings.time, timings.day'
+                        'AND assignments.uid = ' + req.user.uid + '\n'
 
                     connection.query(sql,
                         function(err, result)
@@ -78,20 +77,41 @@ module.exports = function(app)
                     )
                 }
 
-                var curSubCallback = function(curSub)
+                var curSubCallback = function(curSub, streams)
                 {
                     sql = 'SELECT timings.day, timings.time\n' +
-                        'FROM timings, subjects\n' +
-                        'WHERE timings.sid = subjects.sid\n' +
-                        'AND subjects.course = \'' + curSub.course + '\'\n' +
-                        'AND subjects.streams = \'' + curSub.stream + '\'\n' +
-                        'AND subjects.batch = ' + curSub.batch + '\n' +
-                        'ORDER BY timings.day, timings.time'
+                        'FROM timings, subject_streams\n' +
+                        'WHERE\n' +
+                        '(\n' +
+                        '    subject_streams.streamid = ' + streams[0].streamid + '\n'
+                    for(var i = 1; i < streams.length; i++)
+                        sql += '    OR subject_streams.streamid = ' + streams[i].streamid + '\n'
+                    sql += ')\n' +
+                        'AND subject_streams.sid = timings.sid'
+
+                    console.log(sql)
 
                     connection.query(sql,
                         function(err, result)
                         {
+                            console.log(result)
                             theirScheduleCallback(curSub, result)
+                        }
+                    )
+                }
+
+                var subjectStreamsCallback = function(curSub)
+                {
+                    console.log(curSub)
+                    sql = 'SELECT streams.streamid\n' +
+                        'FROM subject_streams, streams\n' +
+                        'WHERE subject_streams.streamid = streams.streamid\n' +
+                        'AND subject_streams.sid = ' + curSub.sid
+
+                    connection.query(sql,
+                        function(err, result)
+                        {
+                            curSubCallback(curSub, result)
                         }
                     )
                 }
@@ -102,12 +122,29 @@ module.exports = function(app)
 
                 connection.query('USE ' + dbconfig.database)
 
-                var sql = 'SELECT * FROM subjects WHERE sid = ' + sid
+                var sql = 'SELECT A.sid, subject_name, course, batch, streams FROM \n' +
+                    '(\n' +
+                    '    SELECT DISTINCT subjects.sid, subjects.name as subject_name, courses.name as course, streams.batch\n' +
+                    '    FROM subjects, subject_streams, courses, streams\n' +
+                    '    WHERE subjects.sid = subject_streams.sid\n' +
+                    '    AND streams.streamid = subject_streams.streamid\n' +
+                    '    AND courses.cid = streams.cid\n' +
+                    ') as A,\n' +
+                    '(\n' +
+                    '    SELECT subjects.sid, GROUP_CONCAT(streams.name SEPARATOR \', \') as streams\n' +
+                    '    FROM subjects, streams, subject_streams\n' +
+                    '    WHERE subjects.sid = subject_streams.sid\n' +
+                    '    AND streams.streamid = subject_streams.streamid\n' +
+                    '    GROUP BY sid\n' +
+                    ') as B\n' +
+                    'WHERE A.sid = B.sid\n' +
+                    'AND A.sid = ' + sid + '\n' +
+                    'ORDER BY batch, course, streams, subject_name'
 
                 connection.query(sql,
                     function(err, result)
                     {
-                        curSubCallback(result[0])
+                        subjectStreamsCallback(result[0])
                     }
                 )
             }
