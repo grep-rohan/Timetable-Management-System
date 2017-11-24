@@ -13,6 +13,24 @@
         return !(charCode > 31 && (charCode < 48 || charCode > 57))
 
     }
+
+    function filter()
+    {
+        var input, filter, table, tr, td, i
+        input = document.getElementById('filter')
+        filter = input.value.toUpperCase()
+        table = document.getElementById('table')
+        tr = table.getElementsByTagName('tr')
+        for(i = 0; i < tr.length; i++)
+        {
+            td = tr[i].getElementsByTagName('td')[0]
+            if(td)
+                if(td.innerHTML.toUpperCase().indexOf(filter) > -1)
+                    tr[i].style.display = ''
+                else
+                    tr[i].style.display = 'none'
+        }
+    }
 </script>
 
 <!--navbar-->
@@ -58,6 +76,35 @@
 
         <button type="submit" class="w3-btn w3-round w3-blue">Add Stream</button>
     </form>
+
+    <br>
+
+    <h2>Existing Streams</h2>
+
+    <input class="w3-input w3-margin-bottom w3-animate-input" type="text" placeholder="Filter Streams"
+           id="filter" onkeyup="filter()" style="width: 30%">
+
+    <div class="w3-responsive">
+        <table class="w3-table w3-bordered w3-hoverable" id="table">
+            <tr>
+                <th class="w3-border-right">Name</th>
+                <th class="w3-border-right">Batch</th>
+                <th>Course</th>
+            </tr>
+            <%
+            for(i = 0; i < streams.length; i++)
+            {
+                var curStream = streams[i] %>
+                <tr>
+                    <td class="w3-border-right"><%= curStream.stream %></td>
+                    <td class="w3-border-right"><%= curStream.batch %></td>
+                    <td><%= curStream.course %></td>
+                </tr>
+            <%
+            }
+            %>
+        </table>
+    </div>
 </div>
 </body>
 </html>

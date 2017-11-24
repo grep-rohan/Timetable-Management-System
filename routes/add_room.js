@@ -10,13 +10,34 @@ module.exports = function(app)
             }
 
             if(req.user.type === 'po')
-                res.render('add_room.ejs',
+            {
+                var mysql = require('mysql')
+                var dbconfig = require('../config/database')
+                var connection = mysql.createConnection(dbconfig.connection)
+
+                connection.query('USE ' + dbconfig.database)
+
+                var sql = 'SELECT rooms.name, rooms.capacity FROM rooms ORDER BY name'
+
+                var callback = function(rooms)
+                {
+                    res.render('add_room.ejs',
+                        {
+                            title: 'Add Room',
+                            message: req.flash('addRoomMessage'),
+                            user: req.user,
+                            rooms: rooms
+                        }
+                    )
+                }
+
+                connection.query(sql,
+                    function(err, result)
                     {
-                        title: 'Add Room',
-                        message: req.flash('addRoomMessage'),
-                        user: req.user
+                        callback(result)
                     }
                 )
+            }
             else
             {
                 var error = new Error('Access Denied!')

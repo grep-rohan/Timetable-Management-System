@@ -26,6 +26,25 @@
 
         <button type="submit" class="w3-btn w3-round w3-blue">Add Course</button>
     </form>
+
+    <br>
+
+    <h2>Existing Courses</h2>
+
+    <div class="w3-responsive">
+        <table class="w3-table w3-bordered w3-hoverable">
+            <%
+            for(var i = 0; i < courses.length; i++)
+            {
+            %>
+                <tr>
+                    <td><%= courses[i].name %></td>
+                </tr>
+            <%
+            }
+            %>
+        </table>
+    </div>
 </div>
 </body>
 </html>

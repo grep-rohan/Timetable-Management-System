@@ -10,13 +10,34 @@ module.exports = function(app)
             }
 
             if(req.user.type === 'po')
-                res.render('add_course.ejs',
+            {
+                var mysql = require('mysql')
+                var dbconfig = require('../config/database')
+                var connection = mysql.createConnection(dbconfig.connection)
+
+                connection.query('USE ' + dbconfig.database)
+
+                var sql = 'SELECT courses.name FROM courses ORDER BY NAME'
+
+                var callback = function(courses)
+                {
+                    res.render('add_course.ejs',
+                        {
+                            title: 'Add Course',
+                            message: req.flash('addCourseMessage'),
+                            user: req.user,
+                            courses: courses
+                        }
+                    )
+                }
+
+                connection.query(sql,
+                    function(err, result)
                     {
-                        title: 'Add Course',
-                        message: req.flash('addCourseMessage'),
-                        user: req.user
+                        callback(result)
                     }
                 )
+            }
             else
             {
                 var error = new Error('Access Denied!')

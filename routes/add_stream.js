@@ -12,14 +12,36 @@ module.exports = function(app)
             if(req.user.type === 'po')
             {
 
-                var callback = function (result)
+                var callback2 = function (courses, streams)
                 {
                     res.render('add_stream.ejs',
                         {
                             title: 'Add Stream',
                             message: req.flash('addStreamMessage'),
                             user: req.user,
-                            courses: result
+                            courses: courses,
+                            streams: streams
+                        }
+                    )
+                }
+
+                var callback1 = function(courses)
+                {
+                    var mysql = require('mysql')
+                    var dbconfig = require('../config/database')
+                    var connection = mysql.createConnection(dbconfig.connection)
+
+                    connection.query('USE ' + dbconfig.database)
+
+                    var sql = 'SELECT streams.name as stream, streams.batch, courses.name as course\n' +
+                        'FROM streams, courses\n' +
+                        'WHERE streams.cid = courses.cid\n' +
+                        'ORDER BY batch, course, stream'
+
+                    connection.query(sql,
+                        function(err, result)
+                        {
+                            callback2(courses, result)
                         }
                     )
                 }
@@ -35,7 +57,7 @@ module.exports = function(app)
                 connection.query(sql,
                     function(err, result)
                     {
-                        callback(result)
+                        callback1(result)
                     }
                 )
             }
