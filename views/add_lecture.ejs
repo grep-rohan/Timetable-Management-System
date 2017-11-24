@@ -11,39 +11,7 @@
     <h2>Choose Time Slot</h2>
     <!--about subject-->
     <div class="w3-panel w3-padding w3-margin-bottom w3-leftbar w3-lime" style="display: inline-block">
-        <%= curSub.name %> - <%= curSub.batch %> - <%= curSub.course.toUpperCase() %>
-        <%
-        if(curSub.course === 'btech')
-        {
-        %>
-            -
-        <%
-        if(curSub.combined === 0)
-        {
-        %>
-            <%= curSub.streams.toUpperCase() %>
-        <%
-        }
-        else
-        {
-            var streams = JSON.parse(curSub.streams)
-        %>
-            <%
-            for(j = 0; j < streams.length - 1; j++)
-            {
-            %>
-            <%= streams[j].toUpperCase() %>,
-            <%
-            }
-            %>
-            <%= streams[j].toUpperCase() %>
-        <%
-        }
-        %>
-
-        <%
-        }
-        %>
+        <%= curSub.subject_name %> - <%= curSub.batch %> - <%= curSub.course %> - <%= curSub.streams %>
     </div>
 
     <!--time table-->

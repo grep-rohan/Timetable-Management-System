@@ -117,14 +117,13 @@ module.exports = function(app)
 
             sql = 'SELECT * FROM students WHERE uid = ' + req.user.uid
 
-            var callback = function()
+            var timingsCallback = function()
             {
-                sql = 'SELECT subjects.name, subjects.abbrev, rooms.name AS room_name, timings.day, timings.time, users.name AS user_name\n' +
-                    'FROM subjects, rooms, students, timings, users, assignments\n' +
+                sql = 'SELECT subjects.name as subject_name, subjects.abbrev, rooms.name AS room_name, timings.day, timings.time, users.name AS faculty\n' +
+                    'FROM subjects, rooms, students, timings, users, assignments, subject_streams\n' +
                     'WHERE students.uid = ' + req.user.uid + '\n' +
-                    'AND subjects.course = students.course\n' +
-                    'AND subjects.streams LIKE CONCAT(\'%\', students.stream, \'%\')\n' +
-                    'AND subjects.batch = students.batch\n' +
+                    'AND subject_streams.streamid = students.streamid\n' +
+                    'AND subjects.sid = subject_streams.sid\n' +
                     'AND subjects.sid = timings.sid\n' +
                     'AND timings.rid = rooms.rid\n' +
                     'AND assignments.sid = subjects.sid\n' +
@@ -147,18 +146,31 @@ module.exports = function(app)
                 )
             }
 
+            var coursesCallback = function()
+            {
+                sql = 'SELECT courses.cid, courses.name FROM courses ORDER BY name'
+
+                connection.query(sql,
+                    function(err, result)
+                    {
+                        res.render('add_student_details.ejs',
+                            {
+                                title: 'Home',
+                                user: req.user,
+                                courses: result
+                            }
+                        )
+                    }
+                )
+            }
+
             connection.query(sql,
                 function(err, result)
                 {
                     if(result.length === 0)
-                        res.render('add_student_details.ejs',
-                            {
-                                title: 'Home',
-                                user: req.user
-                            }
-                        )
+                        coursesCallback()
                     else
-                        callback()
+                       timingsCallback()
                 }
             )
         }
@@ -169,33 +181,14 @@ module.exports = function(app)
         {
             var data = req.body
 
-            // batch validation
-            var batch = data.batch
-            var dt = new Date()
-            var max = dt.getYear() + 1900
-            var min = max - 4
-            if(parseInt(batch) < min || parseInt(batch) > max)
-            {
-                req.flash('addSubjectMessage',
-                    JSON.stringify(
-                        {
-                            status: 'error',
-                            message: 'Batch should be between ' + min + ' and ' + max
-                        }
-                    )
-                )
-                res.redirect('/add_subject')
-                return
-            }
-
             var mysql = require('mysql')
             var dbconfig = require('../config/database')
             var connection = mysql.createConnection(dbconfig.connection)
 
             connection.query('USE ' + dbconfig.database)
 
-            var sql = 'INSERT INTO students (uid, course, stream, batch) VALUES ?'
-            var values = [[req.user.uid, data.course, data.stream, data.batch]]
+            var sql = 'INSERT INTO students (uid, streamid) VALUES ?'
+            var values = [[req.user.uid, data.streamid]]
 
             connection.query(sql, [values],
                 function()
