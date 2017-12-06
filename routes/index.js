@@ -45,7 +45,7 @@ module.exports = function(app)
                     '      FROM (SELECT *, COUNT(sid) AS cnt\n' +
                     '            FROM (SELECT subjects.sid, subjects.name, subjects.abbrev, subjects.lec_per_week\n' +
                     '                  FROM timings, subjects, assignments\n' +
-                    '                  WHERE assignments.uid = 3\n' +
+                    '                  WHERE assignments.uid = ' + req.user.uid + '\n' +
                     '                  AND timings.sid = assignments.sid\n' +
                     '                  AND assignments.sid=subjects.sid) AS x\n' +
                     '            GROUP BY sid) AS y\n' +
@@ -55,7 +55,7 @@ module.exports = function(app)
                     '      FROM subjects, assignments\n' +
                     '      WHERE subjects.sid NOT IN (SELECT DISTINCT sid FROM timings)\n' +
                     '      AND assignments.sid = subjects.sid\n' +
-                    '      AND assignments.uid = 3) AS t\n' +
+                    '      AND assignments.uid = ' + req.user.uid + ') AS t\n' +
                     'ORDER BY cnt, name'
 
                 connection.query(sql,
@@ -77,7 +77,7 @@ module.exports = function(app)
                 '(\n' +
                 '    SELECT subjects.sid, timings.day, timings.time, rooms.name AS room_name, subjects.name AS subject_name, subjects.abbrev\n' +
                 '\tFROM timings, rooms, subjects, assignments\n' +
-                '\tWHERE assignments.uid = 3\n' +
+                '\tWHERE assignments.uid = ' + req.user.uid + '\n' +
                 '\tAND\ttimings.sid = assignments.sid\n' +
                 '\tAND assignments.sid = subjects.sid\n' +
                 '\tAND timings.rid = rooms.rid\n' +

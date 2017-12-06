@@ -23,7 +23,7 @@ module.exports = function(app)
                     '\tFROM subjects\n' +
                     '\tLEFT JOIN assignments\n' +
                     '\tON subjects.sid = assignments.sid\n' +
-                    '    WHERE assignments.uid = 3\n' +
+                    '    WHERE assignments.uid = ' + req.user.uid + '\n' +
                     ') as A,\n' +
                     '(\n' +
                     '    SELECT DISTINCT subjects.sid, courses.name as course, streams.batch\n' +
